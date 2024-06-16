@@ -2,10 +2,10 @@ import streamlit as st
 import pandas as pd
 
 # Título de la aplicación
-st.title('Análisis de Rutas - Fuente: Informe de Recorrido - SATRACK')
+st.title('Análisis de Rutas - Fuente: SATRACK')
 
 # Instrucciones para el usuario
-st.write('Cargue el archico de Detalle del Recorrido.')
+st.write('Cargue el archivo de Detalle del Recorrido.')
 
 # Widget de carga de archivo
 archivo = st.file_uploader("Cargar archivo CSV", type=['csv'])
