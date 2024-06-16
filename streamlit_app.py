@@ -7,16 +7,13 @@ st.title('Análisis de Rutas - Fuente: SATRACK')
 # Instrucciones para el usuario
 st.write('Cargue el archivo de Detalle del Recorrido.')
 
-# Widget de carga de archivo
-archivo = st.file_uploader("Cargar archivo XLSX", type=['xlsx'])
-
 # Verificar si se ha cargado un archivo
 if archivo is not None:
-    # Leer el archivo XLSX
-    df = pd.read_excel(archivo, engine='xlrd')  # Usamos 'openpyxl' como motor para leer XLSX
+    # Leer el archivo CSV
+    df = pd.read_csv(archivo)
 
     # Mostrar el DataFrame
-    st.write('**Datos del archivo XLSX:**')
+    st.write('**Datos del archivo CSV:**')
     st.write(df)
 
     # Opcional: Mostrar información adicional
