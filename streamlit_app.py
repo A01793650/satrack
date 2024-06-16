@@ -8,8 +8,11 @@ from sklearn.ensemble import IsolationForest
 st.title('Análisis de Rutas - Fuente: SATRACK')
 
 # Instrucciones para el usuario
-st.write('En esta aplicación podrás: 1. Identifiar rápidamente lo lugares donde uno o varios vehículo paran y por cuanto tiempo lo hicieron   \n 
-           2.Extraer el archivo identificando si esta en puntos autorizados Cargue el archivo de Detalle del Recorrido.')
+st.write('En esta aplicación podrás:)
+st.write('1. Identifiar rápidamente lo lugares donde uno o varios vehículo paran y por cuanto tiempo lo hicieron')
+st.write('2.Extraer el archivo identificando si esta en puntos autorizados')
+st.write(' ')         
+st.wwrite('Cargue el archivo de Detalle del Recorrido.')
 
 # Widget de carga de archivo
 recorrido = st.file_uploader("Cargar archivo CSV", type=['csv'])
