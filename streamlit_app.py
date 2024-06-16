@@ -8,15 +8,15 @@ st.title('Análisis de Rutas - Fuente: SATRACK')
 st.write('Cargue el archivo de Detalle del Recorrido.')
 
 # Widget de carga de archivo
-archivo = st.file_uploader("Cargar archivo CSV", type=['csv'])
+archivo = st.file_uploader("Cargar archivo XLSX", type=['xlsx'])
 
 # Verificar si se ha cargado un archivo
 if archivo is not None:
-    # Leer el archivo CSV
-    df = pd.read_csv(archivo)
+    # Leer el archivo XLSX
+    df = pd.read_excel(archivo, engine='openpyxl')  # Usamos 'openpyxl' como motor para leer XLSX
 
     # Mostrar el DataFrame
-    st.write('**Datos del archivo CSV:**')
+    st.write('**Datos del archivo XLSX:**')
     st.write(df)
 
     # Opcional: Mostrar información adicional
@@ -26,5 +26,7 @@ if archivo is not None:
     # Opcional: Mostrar gráfico u otras visualizaciones
     # Ejemplo: st.bar_chart(df['columna'])
 
+else:
+    st.write('Aún no se ha cargado ningún archivo.')
 else:
     st.write('Aún no se ha cargado ningún archivo.')
