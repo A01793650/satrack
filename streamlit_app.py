@@ -13,7 +13,7 @@ recorrido = st.file_uploader("Cargar archivo CSV", type=['csv'])
 # Verificar si se ha cargado un archivo
 if recorrido is not None:
     # Leer el archivo CSV
-    df_recorrido = pd.read_csv(archivo)
+    df_recorrido = pd.read_csv(recorrido)
 
     # Mostrar el DataFrame
     st.write('**Datos del archivo CSV:**')
