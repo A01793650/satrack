@@ -7,6 +7,9 @@ st.title('Análisis de Rutas - Fuente: SATRACK')
 # Instrucciones para el usuario
 st.write('Cargue el archivo de Detalle del Recorrido.')
 
+# Widget de carga de archivo
+archivo = st.file_uploader("Cargar archivo CSV", type=['csv'])
+
 # Verificar si se ha cargado un archivo
 if archivo is not None:
     # Leer el archivo CSV
