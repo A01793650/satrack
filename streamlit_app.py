@@ -13,7 +13,7 @@ archivo = st.file_uploader("Cargar archivo XLSX", type=['xlsx'])
 # Verificar si se ha cargado un archivo
 if archivo is not None:
     # Leer el archivo XLSX
-    df = pd.read_excel(archivo, engine='openpyxl')  # Usamos 'openpyxl' como motor para leer XLSX
+    df = pd.read_excel(archivo, engine='xlrd')  # Usamos 'openpyxl' como motor para leer XLSX
 
     # Mostrar el DataFrame
     st.write('**Datos del archivo XLSX:**')
