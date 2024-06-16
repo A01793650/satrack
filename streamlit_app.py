@@ -28,5 +28,4 @@ if archivo is not None:
 
 else:
     st.write('Aún no se ha cargado ningún archivo.')
-else:
-    st.write('Aún no se ha cargado ningún archivo.')
+
