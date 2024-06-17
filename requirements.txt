@@ -1,4 +1,1 @@
 streamlit==1.26.0
-sklearn
-pandas
-streamlit
