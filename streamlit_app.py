@@ -15,7 +15,7 @@ st.write('1. Identifiar rápidamente lo lugares donde uno o varios vehículo par
 st.write('2.Extraer el archivo identificando si esta en puntos autorizados')
 st.write(' ')         
 st.write('Cargue el archivo de Detalle del Recorrido.')
-st.wwrite('')
+st.write('')
 
 # Widget de carga de archivo
 recorrido = st.file_uploader("Cargar archivo CSV", type=['csv'])
