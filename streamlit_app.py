@@ -435,3 +435,14 @@ pipeline_preprocesamiento = Pipeline([
     ('Crear característica de Rango de tiempo por evento', RangoTiempoEvento()),
     ('Crear característica de Horario: día o noche', Horario()),
 ])
+
+# Copia del DF original
+df_copia = df_recorrido.copy()
+
+# Selección de características relevantes
+#features = ['Estado', 'Tipo de Evento', 'Sentido', 'Velocidad (km/h)', 'Hora', 'Día de la semana', 'Es fin de semana']
+#X = df[features]
+
+pipeline_preprocesamiento.fit(df_copia)
+# Transformamos los datos
+df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia)
