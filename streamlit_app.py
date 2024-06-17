@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import folium
 
+from folium.plugins import MarkerCluster
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
 from sklearn.pipeline import Pipeline, make_pipeline
@@ -446,19 +447,23 @@ if recorrido is not None:
     df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia)
 
     # Mapa centrado en una ubicación promedio
-    map_center = [df_EDA_1['Latitud'].mean(), df_EDA_1['Longitud'].mean()]
+    map_center = [ df_recorrido_trans['Latitud'].mean(),  df_recorrido_trans['Longitud'].mean()]
     mapa = folium.Map(location=map_center, zoom_start=12)
     
-    # Añadimos marcadores al mapa
-    for _, row in df_EDA_1.iterrows():
+    # Agrupar marcadores
+    marker_cluster = MarkerCluster().add_to(mapa)
+    
+    # Añadir marcadores al grupo
+    for _, row in  df_recorrido_trans.iterrows():
         folium.Marker(
             location=[row['Latitud'], row['Longitud']],
-            popup=f"Vehículo: {row['Vehículo']}<br>Estado: {row['Estado']}<br>Duración: {row['DuracionEstadoMin']} min",
+            popup=f"Vehículo: {row['Vehículo']}<br>Estado: {row['Estado']}<br>Duración: {row['DuracionEstadoMin']} min <br>Coordenadas: {row['Latitud']} {row['Longitud']}<br>Fecha: {row['datetime GPS']}",
             icon=folium.Icon(color='blue' if row['Estado'] == 'Apagado' else 'green' if row['Estado'] == 'Detenido' else 'red')
-        ).add_to(mapa)
+        ).add_to(marker_cluster)
     
     # Mostrar mapa
-    mapa.save('mapa_vehiculos.html')
+    mapa.save('Mapa_Analisis.html')
+
 
 else:
     st.write('Aún no se ha cargado ningún archivo.')
