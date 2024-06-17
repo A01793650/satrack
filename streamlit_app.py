@@ -449,7 +449,10 @@ if recorrido is not None:
 
     # Verificar si el DataFrame no está vacío
     if not df_recorrido_trans.empty:
-        st.write(df_recorrido_trans)
+        
+        st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
+        st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
+        
         # Función para descargar el DataFrame como archivo CSV
         def descargar_csv(df):
             # Convertir DataFrame a formato CSV
