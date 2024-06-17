@@ -452,7 +452,7 @@ if recorrido is not None:
     def descargar_csv(df):
         try:
             output = df.to_csv(encoding='utf-8-sig')
-            return output.encode('utf-8')
+            return output
         except Exception as e:
             st.error(f"Error al exportar a CSV: {str(e)}")
     
