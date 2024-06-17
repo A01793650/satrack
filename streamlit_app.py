@@ -451,21 +451,24 @@ if recorrido is not None:
     if not df_recorrido_trans.empty:
         # Mostrar el DataFrame en Streamlit
         st.dataframe(df_recorrido_trans)
-    
-        # Función para descargar el DataFrame como archivo Excel
-        def descargar_excel(df):
-            # Convertir DataFrame a formato Excel
-            output = df.to_excel(index=False)
+
+        # Función para descargar el DataFrame como archivo CSV
+        def descargar_csv(df):
+            # Convertir DataFrame a formato CSV
+            output = df.to_csv(index=False)
     
             # Guardar el archivo en una variable
-            excel_file = output.getvalue()
+            csv_file = output.encode('utf-8-sig')  # Para asegurar compatibilidad con Excel y caracteres especiales
     
-            return excel_file
+            return csv_file
     
         # Botón de descarga
-        if st.button('Descargar Excel'):
-            archivo_excel = descargar_excel(df_recorrido_trans)
-            st.download_button(label='Haz clic para descargar', data=archivo_excel, file_name='datos.xlsx', mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        if st.button('Descargar CSV'):
+            archivo_csv = descargar_csv(df)
+            st.download_button(label='Haz clic para descargar', data=archivo_csv, file_name='datos.csv', mime='text/csv')
+else:
+    st.error('El DataFrame está vacío. No hay datos para mostrar.')
+        
     else:
         st.error('El DataFrame está vacío. No hay datos para mostrar.')
 
