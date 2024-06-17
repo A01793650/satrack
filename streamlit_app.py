@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import folium
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
@@ -443,6 +444,21 @@ if recorrido is not None:
     pipeline_preprocesamiento.fit(df_copia)
     # Transformamos los datos
     df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia)
+
+    # Mapa centrado en una ubicación promedio
+    map_center = [df_EDA_1['Latitud'].mean(), df_EDA_1['Longitud'].mean()]
+    mapa = folium.Map(location=map_center, zoom_start=12)
+    
+    # Añadimos marcadores al mapa
+    for _, row in df_EDA_1.iterrows():
+        folium.Marker(
+            location=[row['Latitud'], row['Longitud']],
+            popup=f"Vehículo: {row['Vehículo']}<br>Estado: {row['Estado']}<br>Duración: {row['DuracionEstadoMin']} min",
+            icon=folium.Icon(color='blue' if row['Estado'] == 'Apagado' else 'green' if row['Estado'] == 'Detenido' else 'red')
+        ).add_to(mapa)
+    
+    # Mostrar mapa
+    mapa.save('mapa_vehiculos.html')
 
 else:
     st.write('Aún no se ha cargado ningún archivo.')
