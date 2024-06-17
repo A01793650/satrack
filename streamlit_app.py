@@ -453,9 +453,9 @@ if recorrido is not None:
         st.dataframe(df_recorrido_trans)
     
         # Función para descargar el DataFrame como archivo Excel
-        def descargar_excel(df_recorrido_trans):
+        def descargar_excel(df):
             # Convertir DataFrame a formato Excel
-            output = df_recorrido_trans.to_excel(index=False)
+            output = df.to_excel(index=False)
     
             # Guardar el archivo en una variable
             excel_file = output.getvalue()
@@ -471,7 +471,7 @@ if recorrido is not None:
 
     # Mapa centrado en una ubicación promedio
     map_center = [ df_recorrido_trans['Latitud'].mean(),  df_recorrido_trans['Longitud'].mean()]
-    mapa = folium.Map(location=map_center, zoom_start=12)
+    mapa = folium.Map(location=map_center, zoom_start=20)
     
     # Agrupar marcadores
     marker_cluster = MarkerCluster().add_to(mapa)
