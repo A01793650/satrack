@@ -449,8 +449,6 @@ if recorrido is not None:
 
     # Verificar si el DataFrame no está vacío
     if not df_recorrido_trans.empty:
-        # Mostrar el DataFrame en Streamlit
-        st.dataframe(df_recorrido_trans)
 
         # Función para descargar el DataFrame como archivo CSV
         def descargar_csv(df):
@@ -464,7 +462,7 @@ if recorrido is not None:
     
         # Botón de descarga
         if st.button('Descargar CSV'):
-            archivo_csv = descargar_csv(df)
+            archivo_csv = descargar_csv(df_recorrido_trans)
             st.download_button(label='Haz clic para descargar', data=archivo_csv, file_name='datos.csv', mime='text/csv')
 
     
