@@ -3,6 +3,7 @@ import pandas as pd
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
+from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.ensemble import IsolationForest
 
 
