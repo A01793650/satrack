@@ -451,10 +451,17 @@ if recorrido is not None:
         # Función para descargar el DataFrame como archivo CSV
     def descargar_csv(df):
         try:
-            output = df.to_csv(encoding='utf-8-sig')
-            return output
+            # Crear un buffer de BytesIO para almacenar temporalmente el texto
+            buffer = BytesIO()
+            # Convertir el DataFrame a una cadena de texto (tabulado en este ejemplo)
+            text_data = df.to_csv(index=False, sep='\t')
+            # Escribir la cadena de texto en el buffer
+            buffer.write(text_data.encode())
+            # Obtener los bytes del buffer
+            buffer.seek(0)
+            return buffer
         except Exception as e:
-            st.error(f"Error al exportar a CSV: {str(e)}")
+            st.error(f"Error al exportar a TXT: {str(e)}")
     
     # Ejemplo de uso en Streamlit
     def main():
@@ -466,11 +473,12 @@ if recorrido is not None:
             st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
             st.dataframe(df_recorrido_trans)
     
-            # Botón de descarga CSV
-            if st.button('Descargar CSV'):
-                archivo_csv = descargar_csv(df_recorrido_trans)
-                if archivo_csv:
-                    st.download_button(label='Haz clic para descargar', data=archivo_csv, file_name='datos.csv', mime='text/csv')
+            # Botón de descarga TXT
+            if st.button('Descargar TXT'):
+                archivo_txt = descargar_txt(df_recorrido_trans)
+                if archivo_txt:
+                    st.download_button(label='Haz clic para descargar', data=archivo_txt, file_name='datos.txt', mime='text/plain')
+    
         else:
             st.error('El DataFrame está vacío. No hay datos para mostrar.')
     
