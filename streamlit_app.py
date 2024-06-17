@@ -451,26 +451,19 @@ if recorrido is not None:
         # Función para descargar el DataFrame como archivo CSV
     def descargar_csv(df):
         try:
-            output = df.to_csv(index=False, encoding='utf-8-sig')
+            output = df.to_csv(index=True, encoding='utf-8-sig')
             return output.encode('utf-8')
         except Exception as e:
             st.error(f"Error al exportar a CSV: {str(e)}")
     
     # Ejemplo de uso en Streamlit
     def main():
-        df_recorrido_trans = pd.DataFrame({
-            'Nombre': ['Juan', 'María', 'Pedro'],
-            'Edad': [25, 30, 35],
-            'Ciudad': ['Ciudad A', 'Ciudad B', 'Ciudad C']
-        })
-    
+           
         # Verificar si el DataFrame no está vacío
         if not df_recorrido_trans.empty:
             st.write('**INFORMACIÓN DE DATOS FILTRADOS**')
             st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
             st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
-            # Mostrar el DataFrame en Streamlit
-            st.dataframe(df_recorrido_trans)
     
             # Botón de descarga CSV
             if st.button('Descargar CSV'):
