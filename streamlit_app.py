@@ -429,8 +429,8 @@ if recorrido is not None:
     df_recorrido = pd.read_csv(recorrido)
 
     # Mostrar el DataFrame
-    st.write('**Datos del archivo CSV:**')
-    st.write(df_recorrido)
+    #st.write('**Datos del archivo CSV:**')
+    #st.write(df_recorrido)
 
     # Opcional: Mostrar información adicional
     st.write(f"**Número total de filas:** {len(df_recorrido)}")
@@ -446,6 +446,28 @@ if recorrido is not None:
     pipeline_preprocesamiento.fit(df_copia)
     # Transformamos los datos
     df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia)
+
+    # Verificar si el DataFrame no está vacío
+    if not df_recorrido_trans.empty:
+        # Mostrar el DataFrame en Streamlit
+        st.dataframe(df_recorrido_trans)
+    
+        # Función para descargar el DataFrame como archivo Excel
+        def descargar_excel(df_recorrido_trans):
+            # Convertir DataFrame a formato Excel
+            output = df_recorrido_trans.to_excel(index=False)
+    
+            # Guardar el archivo en una variable
+            excel_file = output.getvalue()
+    
+            return excel_file
+    
+        # Botón de descarga
+        if st.button('Descargar Excel'):
+            archivo_excel = descargar_excel(df_recorrido_trans)
+            st.download_button(label='Haz clic para descargar', data=archivo_excel, file_name='datos.xlsx', mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    else:
+        st.error('El DataFrame está vacío. No hay datos para mostrar.')
 
     # Mapa centrado en una ubicación promedio
     map_center = [ df_recorrido_trans['Latitud'].mean(),  df_recorrido_trans['Longitud'].mean()]
