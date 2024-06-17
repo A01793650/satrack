@@ -447,8 +447,17 @@ if recorrido is not None:
     pipeline_preprocesamiento.fit(df_copia)
     # Transformamos los datos
     df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia)   
+
+    # Función para verificar si un objeto es un DataFrame
+    def es_dataframe(obj):
+        return isinstance(obj, pd.DataFrame)
+    
+    if es_dataframe(df):
+            st.success("El objeto es un DataFrame.")
+            st.write("Las primeras filas del DataFrame son:")
+            st.dataframe(df.head())
         
-        # Función para descargar el DataFrame como archivo CSV
+    # Función para descargar el DataFrame como archivo CSV
     def descargar_csv(df):
         try:
             # Crear un buffer de BytesIO para almacenar temporalmente el texto
