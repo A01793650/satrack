@@ -455,7 +455,7 @@ if recorrido is not None:
     if es_dataframe(df_recorrido_trans):
             st.success("El objeto es un DataFrame.")
             st.write("Las primeras filas del DataFrame son:")
-            st.dataframe(df_recorrido_trans.head())
+            st.table(df_recorrido_trans.head())
         
     # Función para descargar el DataFrame como archivo CSV
     def descargar_csv(df):
