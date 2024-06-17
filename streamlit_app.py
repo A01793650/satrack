@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import folium
- import os
+import os
 
 from folium.plugins import MarkerCluster
 from sklearn.base import BaseEstimator, TransformerMixin
