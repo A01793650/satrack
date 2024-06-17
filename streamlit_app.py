@@ -415,3 +415,23 @@ class Horario(BaseEstimator, TransformerMixin):
         # Aplicar la función a la columna de datetime para crear la nueva característica
         X['Horario'] = X[self.columna_datetime].apply(lambda x: dia_o_noche(x))
         return X
+
+# Construímos el pipeline para el preprocesamiento y creación de nuevas características
+pipeline_preprocesamiento = Pipeline([
+    ('Eliminar filas de Estado del vehículo', RowDropper(column_to_filter='Estado',
+                                                         categories_to_erase=['Movimiento'],
+                                                         categories_to_conserve=None)),
+    #('Agregar etiqueta de sitios autorizados', CoordenadasMerger(df_referencia=df_paradas, columna_etiqueta='JUSTIFICACION EVENTO', tol=0.0001)),
+    ('Trf1: cleaning', CustomCleaner(map_dict={'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u'})),
+    ('Trf2: drop_columns_and_rows', DropColumnsAndRows(columns_to_drop=['Edad del dato', 'Nivel de Batería',
+                                                                        'Temperatura', 'Estado de la puerta'],
+                                                       column_condition='Sentido', condition_value='-')),
+    ('time_transformer', TimeTransformer()),
+    ('Unificar columna fecha y hora GPS', DateTimeUnifier(date_col='Fecha GPS', time_col='Hora GPS', datetime_col='datetime GPS')),
+    ('Borrar columnas de horas y fechas', DropOnlyColums(columns_to_drop=['Fecha GPS', 'Hora GPS', 'Fecha Sistema',
+                                                                          'Hora Sistema'])),
+    ('Calcular duración de cada estado', DuracionEstadoMinutos()),
+    ('Dejar único valor por duración en cada estado', UltimoRegistroPorEstado()),
+    ('Crear característica de Rango de tiempo por evento', RangoTiempoEvento()),
+    ('Crear característica de Horario: día o noche', Horario()),
+])
