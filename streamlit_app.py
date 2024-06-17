@@ -433,7 +433,7 @@ if recorrido is not None:
     #st.write(df_recorrido)
 
     # Opcional: Mostrar información adicional
-    st.write('Información datos cargados')
+    st.write('**INFORMACIÓN DE DATOS CARGADOS**')
     st.write(f"**Número total de filas:** {len(df_recorrido)}")
     st.write(f"**Columnas:** {df_recorrido.columns.tolist()}")
 
@@ -446,31 +446,43 @@ if recorrido is not None:
     
     pipeline_preprocesamiento.fit(df_copia)
     # Transformamos los datos
-    df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia)
-
-    # Verificar si el DataFrame no está vacío
-    if not df_recorrido_trans.empty:
-        st.write('Información datos filtrados')
-        st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
-        st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
+    df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia)   
         
         # Función para descargar el DataFrame como archivo CSV
-        def descargar_csv(df):
-            try:
-                output = df.to_csv(index=False, encoding='utf-8-sig')
-                return output.encode('utf-8')
-            except Exception as e:
-                st.error(f"Error al exportar a CSV: {str(e)}")
+    def descargar_csv(df):
+        try:
+            output = df.to_csv(index=False, encoding='utf-8-sig')
+            return output.encode('utf-8')
+        except Exception as e:
+            st.error(f"Error al exportar a CSV: {str(e)}")
     
-        # Botón de descarga
-        if st.button('Descargar CSV'):
-            archivo_csv = descargar_csv(df_recorrido_trans)
-            st.download_button(label='Haz clic para descargar', data=archivo_csv, file_name='datos.csv', mime='text/csv')
-
+    # Ejemplo de uso en Streamlit
+    def main():
+        df_recorrido_trans = pd.DataFrame({
+            'Nombre': ['Juan', 'María', 'Pedro'],
+            'Edad': [25, 30, 35],
+            'Ciudad': ['Ciudad A', 'Ciudad B', 'Ciudad C']
+        })
     
-    else:
-        st.error('El DataFrame está vacío. No hay datos para mostrar.')
+        # Verificar si el DataFrame no está vacío
+        if not df_recorrido_trans.empty:
+            st.write('**INFORMACIÓN DE DATOS FILTRADOS**')
+            st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
+            st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
+            # Mostrar el DataFrame en Streamlit
+            st.dataframe(df_recorrido_trans)
     
+            # Botón de descarga CSV
+            if st.button('Descargar CSV'):
+                archivo_csv = descargar_csv(df_recorrido_trans)
+                if archivo_csv:
+                    st.download_button(label='Haz clic para descargar', data=archivo_csv, file_name='datos.csv', mime='text/csv')
+        else:
+            st.error('El DataFrame está vacío. No hay datos para mostrar.')
+    
+    if __name__ == "__main__":
+        main()
+        
 
     # Mapa centrado en una ubicación promedio
     map_center = [ df_recorrido_trans['Latitud'].mean(),  df_recorrido_trans['Longitud'].mean()]
