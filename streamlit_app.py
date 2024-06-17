@@ -6,37 +6,6 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.ensemble import IsolationForest
 
-
-# Título de la aplicación
-st.title('Análisis de Rutas - Fuente: SATRACK')
-
-# Instrucciones para el usuario
-st.write('En esta aplicación podrás:')
-st.write('1. Identificar rápidamente los lugares donde uno o varios vehículos paran y por cuanto tiempo lo hicieron')
-st.write('2. Extraer el archivo identificando si estuvo o estuvieron en puntos autorizados')
-st.write(' ')         
-st.write('Cargue el archivo de Detalle del Recorrido.')
-st.write('')
-
-# Widget de carga de archivo
-recorrido = st.file_uploader("Cargar archivo CSV", type=['csv'])
-
-# Verificar si se ha cargado un archivo
-if recorrido is not None:
-    # Leer el archivo CSV
-    df_recorrido = pd.read_csv(recorrido)
-
-    # Mostrar el DataFrame
-    st.write('**Datos del archivo CSV:**')
-    st.write(df_recorrido)
-
-    # Opcional: Mostrar información adicional
-    st.write(f"**Número total de filas:** {len(df_recorrido)}")
-    st.write(f"**Columnas:** {df_recorrido.columns.tolist()}")
-
-else:
-    st.write('Aún no se ha cargado ningún archivo.')
-
 # Transformador para la limpieza
 class CustomCleaner(BaseEstimator, TransformerMixin):
     def __init__(self, map_dict):
@@ -437,13 +406,47 @@ pipeline_preprocesamiento = Pipeline([
     ('Crear característica de Horario: día o noche', Horario()),
 ])
 
-# Copia del DF original
-df_copia = df_recorrido.copy()
+# Título de la aplicación
+st.title('Análisis de Rutas - Fuente: SATRACK')
 
-# Selección de características relevantes
-#features = ['Estado', 'Tipo de Evento', 'Sentido', 'Velocidad (km/h)', 'Hora', 'Día de la semana', 'Es fin de semana']
-#X = df[features]
+# Instrucciones para el usuario
+st.write('En esta aplicación podrás:')
+st.write('1. Identificar rápidamente los lugares donde uno o varios vehículos paran y por cuanto tiempo lo hicieron')
+st.write('2. Extraer el archivo identificando si estuvo o estuvieron en puntos autorizados')
+st.write(' ')         
+st.write('Cargue el archivo de Detalle del Recorrido.')
+st.write('')
 
-pipeline_preprocesamiento.fit(df_copia)
-# Transformamos los datos
-df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia)
+# Widget de carga de archivo
+recorrido = st.file_uploader("Cargar archivo CSV", type=['csv'])
+
+# Verificar si se ha cargado un archivo
+if recorrido is not None:
+    # Leer el archivo CSV
+    df_recorrido = pd.read_csv(recorrido)
+
+    # Mostrar el DataFrame
+    st.write('**Datos del archivo CSV:**')
+    st.write(df_recorrido)
+
+    # Opcional: Mostrar información adicional
+    st.write(f"**Número total de filas:** {len(df_recorrido)}")
+    st.write(f"**Columnas:** {df_recorrido.columns.tolist()}")
+
+    # Copia del DF original
+    df_copia = df_recorrido.copy()
+    
+    # Selección de características relevantes
+    #features = ['Estado', 'Tipo de Evento', 'Sentido', 'Velocidad (km/h)', 'Hora', 'Día de la semana', 'Es fin de semana']
+    #X = df[features]
+    
+    pipeline_preprocesamiento.fit(df_copia)
+    # Transformamos los datos
+    df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia)
+
+else:
+    st.write('Aún no se ha cargado ningún archivo.')
+
+
+
+
