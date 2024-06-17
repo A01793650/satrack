@@ -464,7 +464,7 @@ if recorrido is not None:
             st.write('**INFORMACIÓN DE DATOS FILTRADOS**')
             st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
             st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
-            st.write(df_recorrido)
+            st.write(df_recorrido_trans)
     
             # Botón de descarga CSV
             if st.button('Descargar CSV'):
