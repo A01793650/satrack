@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
-from sklearn.ensemble import IsolationForest
+
 
 # Título de la aplicación
 st.title('Análisis de Rutas - Fuente: SATRACK')
