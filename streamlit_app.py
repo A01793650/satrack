@@ -452,7 +452,7 @@ if recorrido is not None:
     def es_dataframe(obj):
         return isinstance(obj, pd.DataFrame)
     
-    if es_dataframe(df):
+    if es_dataframe(df_recorrido_trans):
             st.success("El objeto es un DataFrame.")
             st.write("Las primeras filas del DataFrame son:")
             st.dataframe(df.head())
