@@ -451,7 +451,7 @@ if recorrido is not None:
         # Función para descargar el DataFrame como archivo CSV
     def descargar_csv(df):
         try:
-            output = df.to_csv(index=True, encoding='utf-8-sig')
+            output = df.to_csv(encoding='utf-8-sig')
             return output.encode('utf-8')
         except Exception as e:
             st.error(f"Error al exportar a CSV: {str(e)}")
