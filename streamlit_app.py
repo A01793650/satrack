@@ -471,13 +471,13 @@ if recorrido is not None:
             st.write('**INFORMACIÓN DE DATOS FILTRADOS**')
             st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
             st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
-            st.dataframe(df_recorrido_trans)
+            #st.dataframe(df_recorrido_trans)
     
             # Botón de descarga TXT
-            if st.button('Descargar TXT'):
-                archivo_txt = descargar_txt(df_recorrido_trans)
-                if archivo_txt:
-                    st.download_button(label='Haz clic para descargar', data=archivo_txt, file_name='datos.txt', mime='text/plain')
+            #if st.button('Descargar TXT'):
+                #archivo_txt = descargar_txt(df_recorrido_trans)
+                #if archivo_txt:
+                    #st.download_button(label='Haz clic para descargar', data=archivo_txt, file_name='datos.txt', mime='text/plain')
     
         else:
             st.error('El DataFrame está vacío. No hay datos para mostrar.')
