@@ -433,6 +433,7 @@ if recorrido is not None:
     #st.write(df_recorrido)
 
     # Opcional: Mostrar información adicional
+    st.write('Información datos cargados')
     st.write(f"**Número total de filas:** {len(df_recorrido)}")
     st.write(f"**Columnas:** {df_recorrido.columns.tolist()}")
 
@@ -449,16 +450,17 @@ if recorrido is not None:
 
     # Verificar si el DataFrame no está vacío
     if not df_recorrido_trans.empty:
-        
+        st.write('Información datos filtrados')
         st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
         st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
         
         # Función para descargar el DataFrame como archivo CSV
         def descargar_csv(df):
-            # Convertir DataFrame a formato CSV
-            output = df.to_csv(index=False, encoding='utf-8-sig')
-       
-            return output
+            try:
+                output = df.to_csv(index=False, encoding='utf-8-sig')
+                return output.encode('utf-8')
+            except Exception as e:
+                st.error(f"Error al exportar a CSV: {str(e)}")
     
         # Botón de descarga
         if st.button('Descargar CSV'):
