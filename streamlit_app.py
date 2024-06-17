@@ -456,12 +456,9 @@ if recorrido is not None:
         # Función para descargar el DataFrame como archivo CSV
         def descargar_csv(df):
             # Convertir DataFrame a formato CSV
-            output = df.to_csv(index=False)
-    
-            # Guardar el archivo en una variable
-            csv_file = output.encode('utf-8-sig')  # Para asegurar compatibilidad con Excel y caracteres especiales
-    
-            return csv_file
+            output = df.to_csv(index=False, encoding='utf-8-sig')
+       
+            return output
     
         # Botón de descarga
         if st.button('Descargar CSV'):
