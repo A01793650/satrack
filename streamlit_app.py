@@ -449,7 +449,7 @@ if recorrido is not None:
     df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia)   
         
         # Función para descargar el DataFrame como archivo CSV
-    """def descargar_csv(df):
+    def descargar_csv(df):
         try:
             # Crear un buffer de BytesIO para almacenar temporalmente el texto
             buffer = BytesIO()
@@ -483,7 +483,7 @@ if recorrido is not None:
             st.error('El DataFrame está vacío. No hay datos para mostrar.')
     
     if __name__ == "__main__":
-        main()"""
+        main()
         
 
     # Mapa centrado en una ubicación promedio
