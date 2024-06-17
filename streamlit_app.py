@@ -466,11 +466,11 @@ if recorrido is not None:
         if st.button('Descargar CSV'):
             archivo_csv = descargar_csv(df)
             st.download_button(label='Haz clic para descargar', data=archivo_csv, file_name='datos.csv', mime='text/csv')
-else:
-    st.error('El DataFrame está vacío. No hay datos para mostrar.')
-        
+
+    
     else:
         st.error('El DataFrame está vacío. No hay datos para mostrar.')
+    
 
     # Mapa centrado en una ubicación promedio
     map_center = [ df_recorrido_trans['Latitud'].mean(),  df_recorrido_trans['Longitud'].mean()]
