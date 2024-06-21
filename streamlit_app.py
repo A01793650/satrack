@@ -454,8 +454,9 @@ if recorrido is not None:
     
     if es_dataframe(df_recorrido_trans):
             st.success("El objeto es un DataFrame.")
-            st.write("Las primeras filas del DataFrame son:")
-            st.table(df_recorrido_trans[cols])
+            st.write('**INFORMACIÓN DE DATOS FILTRADOS**')
+            st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
+            st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
         
     # Función para descargar el DataFrame como archivo CSV
     def descargar_csv(df):
