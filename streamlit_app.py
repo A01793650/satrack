@@ -448,16 +448,6 @@ if recorrido is not None:
     # Transformamos los datos
     df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia)   
 
-    # Función para verificar si un objeto es un DataFrame
-    def es_dataframe(obj):
-        return isinstance(obj, pd.DataFrame)
-    
-    if es_dataframe(df_recorrido_trans):
-            st.success("El objeto es un DataFrame.")
-            st.write('**INFORMACIÓN DE DATOS FILTRADOS**')
-            st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
-            st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
-        
     # Función para descargar el DataFrame como archivo CSV
     def descargar_csv(df):
         try:
@@ -473,15 +463,13 @@ if recorrido is not None:
         except Exception as e:
             st.error(f"Error al exportar a TXT: {str(e)}")
     
-    # Ejemplo de uso en Streamlit
     def main():
-           
         # Verificar si el DataFrame no está vacío
         if not df_recorrido_trans.empty:
             st.write('**INFORMACIÓN DE DATOS FILTRADOS**')
             st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
             st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
-            st.write(df_recorrido_trans.head())
+            st.dataframe(df_recorrido_trans)
     
             # Botón de descarga TXT
             if st.button('Descargar TXT'):
