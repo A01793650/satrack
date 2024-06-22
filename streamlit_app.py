@@ -469,7 +469,7 @@ if recorrido is not None:
             if st.button('Descargar CSV'):
                 archivo_txt = descargar_csv(df_recorrido_trans)
                 if archivo_txt:
-                    st.download_button(label='Haz clic para descargar', data=archivo_txt, file_name='datos.csv')
+                    st.download_button(label='Haz clic para descargar', data=archivo_txt, file_name='Datos_Analisis.csv')
     
         else:
             st.error('El DataFrame está vacío. No hay datos para mostrar.')
