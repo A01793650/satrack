@@ -447,21 +447,21 @@ if recorrido is not None:
     pipeline_preprocesamiento.fit(df_copia)
     # Transformamos los datos
     df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia) 
-    #df['your_duration_column'] = df['your_duration_column'].astype(str)
+    df_recorrido_trans['DuracionEstado'] = df_recorrido_trans['DuracionEstado'].astype(str)
     #df_recorrido_trans = df_recorrido_trans [['Vehículo', 'Estado', 'Tipo de Evento', 'Ubicación', 'Velocidad (km/h)', 'Odómetro', 'Longitud', 'Latitud', 'Sentido', 'datetime GPS', 'DuracionEstadoMin', 'RangoTiempoEvento', 'Horario']]
 
     # Función para descargar el DataFrame como archivo CSV
     def descargar_csv(df):
         try:
             # Crear un buffer de BytesIO para almacenar temporalmente el texto
-            buffer = BytesIO()
+            #buffer = BytesIO()
             # Convertir el DataFrame a una cadena de texto (tabulado en este ejemplo)
             text_data = df.to_csv()
             # Escribir la cadena de texto en el buffer
-            buffer.write(text_data.encode())
+            #buffer.write(text_data.encode())
             # Obtener los bytes del buffer
-            buffer.seek(0)
-            return buffer
+            #buffer.seek(0)
+            return text_data
         except Exception as e:
             st.error(f"Error al exportar a CSV: {str(e)}")
     
