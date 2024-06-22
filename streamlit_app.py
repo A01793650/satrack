@@ -453,7 +453,7 @@ if recorrido is not None:
     def descargar_csv(df):
         try:
             # Convertir el DataFrame a una cadena de texto (tabulado en este ejemplo)
-            text_data = df.to_csv(encoding='utf-8')
+            text_data = df.to_csv(encoding='latin1')
             return text_data
         except Exception as e:
             st.error(f"Error al exportar a CSV: {str(e)}")
@@ -464,7 +464,6 @@ if recorrido is not None:
             st.write('**INFORMACIÓN DE DATOS FILTRADOS**')
             st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
             st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
-            st.text(df_recorrido_trans.dtypes)
     
             # Botón de descarga TXT
             if st.button('Descargar CSV'):
