@@ -494,9 +494,6 @@ if recorrido is not None:
         buffer_distance_m = buffer_distance_km * 1000  # Convertir kilómetros a metros
         gdf1['geometry'] = gdf1.geometry.buffer(buffer_distance_m)
 
-        # Verificar índice espacial
-        print(gpd.options.has_sindex)
-
         # Realizar la intersección
         intersection = gpd.sjoin(gdf2, gdf1, how='inner')
         
