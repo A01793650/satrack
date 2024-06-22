@@ -455,7 +455,7 @@ if recorrido is not None:
             # Crear un buffer de BytesIO para almacenar temporalmente el texto
             buffer = BytesIO()
             # Convertir el DataFrame a una cadena de texto (tabulado en este ejemplo)
-            text_data = df.to_csv(index=False, sep='\t')
+            text_data = df.to_csv(index=False)
             # Escribir la cadena de texto en el buffer
             buffer.write(text_data.encode())
             # Obtener los bytes del buffer
