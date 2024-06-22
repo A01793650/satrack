@@ -10,6 +10,8 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.ensemble import IsolationForest
 from shapely.geometry import Point
+from rtree import index
+from rtree.index import Rtree
 
 # Transformador para la limpieza
 class CustomCleaner(BaseEstimator, TransformerMixin):
