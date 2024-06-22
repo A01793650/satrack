@@ -10,3 +10,5 @@ folium == 0.17.0
 geopandas == 0.10.2
 rtree==0.9.7
 pygeos == 0.14
+fiona==1.8.22
+shapely==1.8.5
