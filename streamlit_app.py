@@ -447,7 +447,7 @@ def read_csv(df):
         return df_copia
         
      except Exception as e:
-            st.error(f"Error al cargar a CSV: {str(e)}")
+         st.error(f"Error al cargar a CSV: {str(e)}")
 
 df_copia_r = read_csv(recorrido)
 pipeline_preprocesamiento.fit(df_copia_r)
