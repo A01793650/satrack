@@ -536,7 +536,7 @@ if recorrido is not None:
             folium.Marker(
                 location=[row['Latitud'], row['Longitud']],
                 popup=f"Vehículo: {row['Vehículo']}<br>Estado: {row['Estado']}<br>Duración: {row['DuracionEstadoMin']} min <br>Coordenadas: {row['Latitud']} {row['Longitud']}<br>Fecha: {row['datetime GPS']}",
-                icon=folium.Icon(color='blue' if row['Estado'] == 'Apagado' else 'green' if row['Estado'] == 'Detenido' else 'red')
+                icon=folium.Icon(color='red' if row['Estado'] == 'Apagado' else 'yellow' if row['Estado'] == 'Detenido' else 'green')
             ).add_to(marker_cluster)
         
         # Mostrar mapa
