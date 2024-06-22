@@ -12,4 +12,5 @@ rtree==0.9.7
 pygeos == 0.14
 fiona==1.8.22
 shapely==1.8.5
+libspatialindex == 2.0.0
 
