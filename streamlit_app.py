@@ -391,9 +391,6 @@ class Horario(BaseEstimator, TransformerMixin):
 
 # Construímos el pipeline para el preprocesamiento y creación de nuevas características
 pipeline_preprocesamiento = Pipeline([
-    ('Eliminar filas de Estado del vehículo', RowDropper(column_to_filter='Estado',
-                                                         categories_to_erase=['Movimiento'],
-                                                         categories_to_conserve=None)),
     #('Agregar etiqueta de sitios autorizados', CoordenadasMerger(df_referencia=df_paradas, columna_etiqueta='JUSTIFICACION EVENTO', tol=0.0001)),
     ('Trf1: cleaning', CustomCleaner(map_dict={'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u'})),
     ('Trf2: drop_columns_and_rows', DropColumnsAndRows(columns_to_drop=['Edad del dato', 'Nivel de Batería',
@@ -407,6 +404,9 @@ pipeline_preprocesamiento = Pipeline([
     ('Dejar único valor por duración en cada estado', UltimoRegistroPorEstado()),
     ('Crear característica de Rango de tiempo por evento', RangoTiempoEvento()),
     ('Crear característica de Horario: día o noche', Horario()),
+    ('Eliminar filas de Estado del vehículo', RowDropper(column_to_filter='Estado',
+                                                         categories_to_erase=['Movimiento'],
+                                                         categories_to_conserve=None))
 ])
 
 # Título de la aplicación
