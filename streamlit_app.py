@@ -421,14 +421,14 @@ st.write('Cargue el archivo de Detalle del Recorrido.')
 st.write('')
 
 # Widget de carga de archivo
-recorrido = st.file_uploader("Cargar archivo CSV", type=['csv'])
+recorrido = st.file_uploader("Cargar archivo CSV", type=['csv'], key="recorrido")
 
 st.write(' ')         
 st.write('Cargue el archivo de Puntos Autorizados')
 st.write('')
 
 # Widget de carga de archivo
-autorizado = st.file_uploader("Cargar archivo CSV", type=['csv'])
+autorizado = st.file_uploader("Cargar archivo CSV", type=['csv'], key="autorizado")
 
 def read_csv(df):
     try:
