@@ -470,7 +470,8 @@ if recorrido is not None:
             st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
             st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
             st.text(df_recorrido_trans.dtypes)
-            st.dataframe(df_recorrido_trans[['Vehículo', 'Estado', 'Tipo de Evento', 'Ubicación', 'Velocidad (km/h)']])
+            df_recorrido_trans = df_recorrido_trans [['Vehículo', 'Estado', 'Tipo de Evento', 'Ubicación', 'Velocidad (km/h)', 'Odómetro', 'Longitud', 'Latitud', 'Sentido', 'datetime GPS', 'DuracionEstadoMin', 'RangoTiempoEvento', 'Horario']]
+            st.dataframe(df_recorrido_trans)
     
             # Botón de descarga TXT
             if st.button('Descargar TXT'):
