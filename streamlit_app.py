@@ -494,7 +494,7 @@ if recorrido is not None:
         gdf1['geometry'] = gdf1.geometry.buffer(buffer_distance_m)
         
         # Realizar la intersección
-        intersection = gpd.sjoin(gdf2, gdf1, how='inner', op='within')
+        intersection = gpd.sjoin(gdf2, gdf1, how='inner')
         
         # Convertir la intersección a un DataFrame
         intersection_df = pd.DataFrame(intersection.drop(columns='geometry'))
