@@ -494,7 +494,6 @@ if recorrido is not None:
         gdf1['geometry'] = gdf1.geometry.buffer(buffer_distance_m)
 
         # Verificar índice espacial
-        print(gpd.__version__)
         print(gpd.options.has_sindex)
 
         # Realizar la intersección
