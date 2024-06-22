@@ -2,12 +2,14 @@ import streamlit as st
 import pandas as pd
 import folium
 import os
+import geopandas as gpd
 
 from folium.plugins import MarkerCluster
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.ensemble import IsolationForest
+from shapely.geometry import Point
 
 # Transformador para la limpieza
 class CustomCleaner(BaseEstimator, TransformerMixin):
