@@ -421,7 +421,7 @@ st.write('Cargue el archivo de Detalle del Recorrido.')
 st.write('')
 
 # Widget de carga de archivo
-recorrido = st.file_uploader("Cargar archivo CSV. Convierte tus archivos desde https://cloudconvert.com/xlsx-to-csv", type=['csv'], key="file_uploader_r")
+recorrido = st.file_uploader("Convierte tus archivos desde https://cloudconvert.com/xlsx-to-csv", type=['csv'], key="file_uploader_r")
 
 # Verificar si se ha cargado un archivo
 if recorrido is not None:
@@ -454,7 +454,24 @@ if recorrido is not None:
     st.write('')
     
     # Widget de carga de archivo
-    autorizado = st.file_uploader("Cargar archivo CSV", type=['csv'], key="file_uploader_a")
+    autorizado = st.file_uploader("Convierte tus archivos desde https://cloudconvert.com/xlsx-to-csv", type=['csv'], key="file_uploader_a")
+
+    # Verificar si se ha cargado un archivo
+    if autorizado is not None:
+        # Leer el archivo CSV
+        df_autorizado = pd.read_csv(autorizado)
+    
+        # Mostrar el DataFrame
+        #st.write('**Datos del archivo CSV:**')
+        #st.write(df_recorrido)
+    
+        # Opcional: Mostrar información adicional
+        st.write('**INFORMACIÓN DE DATOS CARGADOS**')
+        st.write(f"**Número total de filas:** {len(df_autorizado)}")
+        st.write(f"**Columnas:** {df_recorrido.columns.tolist()}")
+    
+        # Copia del DF original
+        df_copia_a = df_autorizado.copy()
 
     # Función para descargar el DataFrame como archivo CSV
     def descargar_csv(df):
