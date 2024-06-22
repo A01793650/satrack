@@ -446,8 +446,9 @@ if recorrido is not None:
     
     pipeline_preprocesamiento.fit(df_copia)
     # Transformamos los datos
-    df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia)   
-    df_recorrido_trans = df_recorrido_trans [['Vehículo', 'Estado', 'Tipo de Evento', 'Ubicación', 'Velocidad (km/h)', 'Odómetro', 'Longitud', 'Latitud', 'Sentido', 'datetime GPS', 'DuracionEstadoMin', 'RangoTiempoEvento', 'Horario']]
+    df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia) 
+    #df['your_duration_column'] = df['your_duration_column'].astype(str)
+    #df_recorrido_trans = df_recorrido_trans [['Vehículo', 'Estado', 'Tipo de Evento', 'Ubicación', 'Velocidad (km/h)', 'Odómetro', 'Longitud', 'Latitud', 'Sentido', 'datetime GPS', 'DuracionEstadoMin', 'RangoTiempoEvento', 'Horario']]
 
     # Función para descargar el DataFrame como archivo CSV
     def descargar_csv(df):
@@ -455,14 +456,14 @@ if recorrido is not None:
             # Crear un buffer de BytesIO para almacenar temporalmente el texto
             buffer = BytesIO()
             # Convertir el DataFrame a una cadena de texto (tabulado en este ejemplo)
-            text_data = df.to_csv(index=False)
+            text_data = df.to_csv()
             # Escribir la cadena de texto en el buffer
             buffer.write(text_data.encode())
             # Obtener los bytes del buffer
             buffer.seek(0)
             return buffer
         except Exception as e:
-            st.error(f"Error al exportar a TXT: {str(e)}")
+            st.error(f"Error al exportar a CSV: {str(e)}")
     
     def main():
         # Verificar si el DataFrame no está vacío
@@ -471,13 +472,12 @@ if recorrido is not None:
             st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
             st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
             st.text(df_recorrido_trans.dtypes)
-            st.dataframe(df_recorrido_trans)
     
             # Botón de descarga TXT
-            if st.button('Descargar TXT'):
-                archivo_txt = descargar_txt(df_recorrido_trans)
+            if st.button('Descargar CSV'):
+                archivo_txt = descargar_csv(df_recorrido_trans)
                 if archivo_txt:
-                    st.download_button(label='Haz clic para descargar', data=archivo_txt, file_name='datos.txt', mime='text/plain')
+                    st.download_button(label='Haz clic para descargar', data=archivo_txt, file_name='datos.csv')
     
         else:
             st.error('El DataFrame está vacío. No hay datos para mostrar.')
