@@ -421,7 +421,7 @@ st.write('Cargue el archivo de Detalle del Recorrido.')
 st.write('')
 
 # Widget de carga de archivo
-recorrido = st.file_uploader("Cargar archivo CSV", type=['csv'])
+recorrido = st.file_uploader("Cargar archivo CSV. Convierte tus archivos desde https://cloudconvert.com/xlsx-to-csv", type=['csv'], key="file_uploader_r")
 
 # Verificar si se ha cargado un archivo
 if recorrido is not None:
@@ -454,7 +454,7 @@ if recorrido is not None:
     st.write('')
     
     # Widget de carga de archivo
-    autorizado = st.file_uploader("Cargar archivo CSV", type=['csv'])
+    autorizado = st.file_uploader("Cargar archivo CSV", type=['csv'], key="file_uploader_a")
 
     # Función para descargar el DataFrame como archivo CSV
     def descargar_csv(df):
