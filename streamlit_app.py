@@ -471,7 +471,7 @@ if recorrido is not None:
         st.write('**INFORMACIÓN DE DATOS CARGADOS**')
         st.write(f"**Número total de filas:** {len(df_autorizado)}")
         st.write(f"**Columnas:** {df_autorizado.columns.tolist()}")
-        st.write(df_autorizado.dtype)
+        st.write(df_autorizado.head())
     
         # Copia del DF original
         df_copia_a = df_autorizado.copy()
