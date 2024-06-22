@@ -423,13 +423,6 @@ st.write('')
 # Widget de carga de archivo
 recorrido = st.file_uploader("Cargar archivo CSV", type=['csv'], key="recorrido")
 
-st.write(' ')         
-st.write('Cargue el archivo de Puntos Autorizados')
-st.write('')
-
-# Widget de carga de archivo
-autorizado = st.file_uploader("Cargar archivo CSV", type=['csv'], key="autorizado")
-
 def read_csv(df):
     try:
         # Leer el archivo CSV
@@ -450,6 +443,13 @@ pipeline_preprocesamiento.fit(df_copia_r)
 df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia_r) 
 df_recorrido_trans['DuracionEstado'] = df_recorrido_trans['DuracionEstado'].astype(str)
 
+st.write(' ')         
+st.write('Cargue el archivo de Puntos Autorizados')
+st.write('')
+
+# Widget de carga de archivo
+autorizado = st.file_uploader("Cargar archivo CSV", type=['csv'], key="autorizado")
+df_copia_a = read_csv(autorizado)
 
 
 
