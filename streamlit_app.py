@@ -482,24 +482,20 @@ if recorrido is not None:
         except Exception as e:
             st.error(f"Error al exportar a CSV: {str(e)}")
     
-    def main():
-        # Verificar si el DataFrame no está vacío
-        if not df_recorrido_trans.empty:
-            st.write('**INFORMACIÓN DE DATOS FILTRADOS**')
-            st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
-            st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
-    
-            # Botón de descarga TXT
-            if st.button('Descargar CSV'):
-                archivo_txt = descargar_csv(df_recorrido_trans)
-                if archivo_txt:
-                    st.download_button(label='Haz clic para descargar', data=archivo_txt, file_name='Datos_Analisis.csv')
-    
-        else:
-            st.error('El DataFrame está vacío. No hay datos para mostrar.')
-    
-    if __name__ == "__main__":
-        main()
+    # Verificar si el DataFrame no está vacío
+    if not df_recorrido_trans.empty:
+        st.write('**INFORMACIÓN DE DATOS FILTRADOS**')
+        st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
+        st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
+
+        # Botón de descarga TXT
+        if st.button('Descargar CSV'):
+            archivo_txt = descargar_csv(df_recorrido_trans)
+            if archivo_txt:
+                st.download_button(label='Haz clic para descargar', data=archivo_txt, file_name='Datos_Analisis.csv')
+
+    else:
+        st.error('El DataFrame está vacío. No hay datos para mostrar.')
         
 
     # Mapa centrado en una ubicación promedio
