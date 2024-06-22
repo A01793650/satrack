@@ -478,7 +478,7 @@ if recorrido is not None:
 
         # Convertir los DataFrames en GeoDataFrames
         gdf1 = gpd.GeoDataFrame(df_recorrido_trans, geometry=gpd.points_from_xy(df_recorrido_trans.Longitud, df_recorrido_trans.Latitud))
-        gdf2 = gpd.GeoDataFrame(df_autorizado, geometry=gpd.points_from_xy(df_autorizado.LONGITUD, df_autorizado.LATITUD))
+        gdf2 = gpd.GeoDataFrame(df_autorizado, geometry=gpd.points_from_xy(df_autorizado.Longitud, df_autorizado.Latitud))
         
         # Definir el CRS en WGS 84
         gdf1.set_crs(epsg=4326, inplace=True)
