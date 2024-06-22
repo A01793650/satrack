@@ -431,21 +431,16 @@ st.write('')
 autorizado = st.file_uploader("Cargar archivo CSV", type=['csv'])
 
 def read_csv(df):
-    
     try:
         # Leer el archivo CSV
         df = pd.read_csv(df)
-    
         # Opcional: Mostrar información adicional
         st.write('**INFORMACIÓN DE DATOS CARGADOS**')
         st.write(f"**Número total de filas:** {len(df)}")
         st.write(f"**Columnas:** {df.columns.tolist()}")
-    
         # Copia del DF original
         df_copia = df.copy()
-        
         return df_copia
-        
      except Exception as e:
          st.error(f"Error al cargar a CSV: {str(e)}")
 
