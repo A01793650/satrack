@@ -475,6 +475,29 @@ if recorrido is not None:
         # Copia del DF original
         df_copia_a = df_autorizado.copy()
 
+        # Convertir los DataFrames en GeoDataFrames
+        gdf1 = gpd.GeoDataFrame(df_recorrido_trans, geometry=gpd.points_from_xy(df_recorrido_trans.Longitud, df_recorrido_trans.Latitud))
+        gdf2 = gpd.GeoDataFrame(df_copia_a, geometry=gpd.points_from_xy(df_copia_a.LONGITUD, df_copia_a.LATITUD))
+        
+        # Definir el CRS en WGS 84
+        gdf1.set_crs(epsg=4326, inplace=True)
+        gdf2.set_crs(epsg=4326, inplace=True)
+        
+        # Proyectar a UTM (por ejemplo, EPSG:9377)
+        gdf1 = gdf1.to_crs(epsg=9377)
+        gdf2 = gdf2.to_crs(epsg=9377)
+        
+        # Aplicar el buffer a las coordenadas del primer GeoDataFrame
+        buffer_distance_km = 1  # Distancia del buffer en kilómetros
+        buffer_distance_m = buffer_distance_km * 1000  # Convertir kilómetros a metros
+        gdf1['geometry'] = gdf1.geometry.buffer(buffer_distance_m)
+        
+        # Realizar la intersección
+        intersection = gpd.sjoin(gdf2, gdf1, how='inner', op='within')
+        
+        # Convertir la intersección a un DataFrame
+        intersection_df = pd.DataFrame(intersection.drop(columns='geometry'))
+
         # Función para descargar el DataFrame como archivo CSV
         def descargar_csv(df):
             try:
