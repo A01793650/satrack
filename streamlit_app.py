@@ -502,7 +502,7 @@ if recorrido is not None:
         idx2 = gdf2.sindex
 
         # Realizar la intersección
-        intersection = gpd.sjoin(gdf2, gdf1, how='inner')
+        intersection = gpd.overlay(gdf2, gdf1, how='intersection')
         
         # Convertir la intersección a un DataFrame
         intersection_df = pd.DataFrame(intersection.drop(columns='geometry'))
