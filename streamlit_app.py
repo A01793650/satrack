@@ -421,105 +421,111 @@ st.write('Cargue el archivo de Detalle del Recorrido.')
 st.write('')
 
 # Widget de carga de archivo
-recorrido = st.file_uploader("Cargar archivo CSV", type=['csv'], key="recorrido")
+recorrido = st.file_uploader("Cargar archivo CSV", type=['csv'])
 
-def read_csv(df):
-    try:
-        # Leer el archivo CSV
-        df = pd.read_csv(df)
-        # Opcional: Mostrar información adicional
-        st.write('**INFORMACIÓN DE DATOS CARGADOS**')
-        st.write(f"**Número total de filas:** {len(df)}")
-        st.write(f"**Columnas:** {df.columns.tolist()}")
-        # Copia del DF original
-        df_copia = df.copy()
-        return df_copia
-    except Exception as a:
-         st.error(f"Error al cargar a CSV: {str(a)}")
+# Verificar si se ha cargado un archivo
+if recorrido is not None:
+    # Leer el archivo CSV
+    df_recorrido = pd.read_csv(recorrido)
 
-df_copia_r = read_csv(recorrido)
-pipeline_preprocesamiento.fit(df_copia_r)
-# Transformamos los datos
-df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia_r) 
-df_recorrido_trans['DuracionEstado'] = df_recorrido_trans['DuracionEstado'].astype(str)
+    # Mostrar el DataFrame
+    #st.write('**Datos del archivo CSV:**')
+    #st.write(df_recorrido)
 
-st.write(' ')         
-st.write('Cargue el archivo de Puntos Autorizados')
-st.write('')
+    # Opcional: Mostrar información adicional
+    st.write('**INFORMACIÓN DE DATOS CARGADOS**')
+    st.write(f"**Número total de filas:** {len(df_recorrido)}")
+    st.write(f"**Columnas:** {df_recorrido.columns.tolist()}")
 
-# Widget de carga de archivo
-autorizado = st.file_uploader("Cargar archivo CSV", type=['csv'], key="autorizado")
-df_copia_a = read_csv(autorizado)
-
-
-
-# Función para descargar el DataFrame como archivo CSV
-def descargar_csv(df):
-    try:
-        # Convertir el DataFrame a una cadena de texto (tabulado en este ejemplo)
-        text_data = df.to_csv(encoding='latin1')
-        return text_data
-    except Exception as e:
-        st.error(f"Error al exportar a CSV: {str(e)}")
-
-def main():
-    # Verificar si el DataFrame no está vacío
-    if not df_recorrido_trans.empty:
-        st.write('**INFORMACIÓN DE DATOS FILTRADOS**')
-        st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
-        st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
-
-        # Botón de descarga TXT
-        if st.button('Descargar CSV'):
-            archivo_txt = descargar_csv(df_recorrido_trans)
-            if archivo_txt:
-                st.download_button(label='Haz clic para descargar', data=archivo_txt, file_name='Datos_Analisis.csv')
-
-    else:
-        st.error('El DataFrame está vacío. No hay datos para mostrar.')
-
-if __name__ == "__main__":
-    main()
+    # Copia del DF original
+    df_copia = df_recorrido.copy()
     
+    # Selección de características relevantes
+    #features = ['Estado', 'Tipo de Evento', 'Sentido', 'Velocidad (km/h)', 'Hora', 'Día de la semana', 'Es fin de semana']
+    #X = df[features]
+    
+    pipeline_preprocesamiento.fit(df_copia)
+    # Transformamos los datos
+    df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia) 
+    df_recorrido_trans['DuracionEstado'] = df_recorrido_trans['DuracionEstado'].astype(str)
 
-# Mapa centrado en una ubicación promedio
-map_center = [ df_recorrido_trans['Latitud'].mean(),  df_recorrido_trans['Longitud'].mean()]
-mapa = folium.Map(location=map_center, zoom_start=6)
+    st.write(' ')         
+    st.write('Cargue el archivo de Puntos Autorizados.')
+    st.write('')
+    
+    # Widget de carga de archivo
+    autorizado = st.file_uploader("Cargar archivo CSV", type=['csv'])
 
-# Agrupar marcadores
-marker_cluster = MarkerCluster().add_to(mapa)
+    # Función para descargar el DataFrame como archivo CSV
+    def descargar_csv(df):
+        try:
+            # Convertir el DataFrame a una cadena de texto (tabulado en este ejemplo)
+            text_data = df.to_csv(encoding='latin1')
+            return text_data
+        except Exception as e:
+            st.error(f"Error al exportar a CSV: {str(e)}")
+    
+    def main():
+        # Verificar si el DataFrame no está vacío
+        if not df_recorrido_trans.empty:
+            st.write('**INFORMACIÓN DE DATOS FILTRADOS**')
+            st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
+            st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
+    
+            # Botón de descarga TXT
+            if st.button('Descargar CSV'):
+                archivo_txt = descargar_csv(df_recorrido_trans)
+                if archivo_txt:
+                    st.download_button(label='Haz clic para descargar', data=archivo_txt, file_name='Datos_Analisis.csv')
+    
+        else:
+            st.error('El DataFrame está vacío. No hay datos para mostrar.')
+    
+    if __name__ == "__main__":
+        main()
+        
 
-# Añadir marcadores al grupo
-for _, row in  df_recorrido_trans.iterrows():
-    folium.Marker(
-        location=[row['Latitud'], row['Longitud']],
-        popup=f"Vehículo: {row['Vehículo']}<br>Estado: {row['Estado']}<br>Duración: {row['DuracionEstadoMin']} min <br>Coordenadas: {row['Latitud']} {row['Longitud']}<br>Fecha: {row['datetime GPS']}",
-        icon=folium.Icon(color='blue' if row['Estado'] == 'Apagado' else 'green' if row['Estado'] == 'Detenido' else 'red')
-    ).add_to(marker_cluster)
+    # Mapa centrado en una ubicación promedio
+    map_center = [ df_recorrido_trans['Latitud'].mean(),  df_recorrido_trans['Longitud'].mean()]
+    mapa = folium.Map(location=map_center, zoom_start=6)
+    
+    # Agrupar marcadores
+    marker_cluster = MarkerCluster().add_to(mapa)
+    
+    # Añadir marcadores al grupo
+    for _, row in  df_recorrido_trans.iterrows():
+        folium.Marker(
+            location=[row['Latitud'], row['Longitud']],
+            popup=f"Vehículo: {row['Vehículo']}<br>Estado: {row['Estado']}<br>Duración: {row['DuracionEstadoMin']} min <br>Coordenadas: {row['Latitud']} {row['Longitud']}<br>Fecha: {row['datetime GPS']}",
+            icon=folium.Icon(color='blue' if row['Estado'] == 'Apagado' else 'green' if row['Estado'] == 'Detenido' else 'red')
+        ).add_to(marker_cluster)
+    
+    # Mostrar mapa
+    mapa.save('Mapa_Analisis.html')
+    
+    # Ruta al archivo HTML generado por Folium o Plotly
+    archivo_html = 'Mapa_Analisis.html'
+    
+    # Verificar si el archivo existe
+    if os.path.isfile(archivo_html):
+        # Mostrar un mensaje o título
+        st.title('Descargar Mapa de Análisis')
+    
+        # Mostrar el botón de descarga
+        def descargar_html():
+            with open(archivo_html, 'rb') as f:
+                contenido = f.read()
+            return contenido
+    
+        # Botón de descarga
+        if st.button('Descargar Mapa'):
+            contenido_archivo = descargar_html()
+            st.download_button(label='Haz clic para descargar', data=contenido_archivo, file_name='Mapa_Analisis.html', mime='text/html')
+    else:
+        st.error('El archivo HTML generado no se encontró. Por favor, genera el mapa primero.')
 
-# Mostrar mapa
-mapa.save('Mapa_Analisis.html')
-
-# Ruta al archivo HTML generado por Folium o Plotly
-archivo_html = 'Mapa_Analisis.html'
-
-# Verificar si el archivo existe
-if os.path.isfile(archivo_html):
-    # Mostrar un mensaje o título
-    st.title('Descargar Mapa de Análisis')
-
-    # Mostrar el botón de descarga
-    def descargar_html():
-        with open(archivo_html, 'rb') as f:
-            contenido = f.read()
-        return contenido
-
-    # Botón de descarga
-    if st.button('Descargar Mapa'):
-        contenido_archivo = descargar_html()
-        st.download_button(label='Haz clic para descargar', data=contenido_archivo, file_name='Mapa_Analisis.html', mime='text/html')
 else:
-    st.error('El archivo HTML generado no se encontró. Por favor, genera el mapa primero.')
+    st.write('Aún no se ha cargado ningún archivo.')
 
 
 
