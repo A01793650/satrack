@@ -1,196 +1,475 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import folium
 import os
-from io import BytesIO
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 from folium.plugins import MarkerCluster
-#from sklearn.base import TransformerMixin, BaseEstimator
-#from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
-#from sklearn.pipeline import Pipeline, make_pipeline
-#from sklearn.ensemble import IsolationForest
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
+from sklearn.pipeline import Pipeline, make_pipeline
+from sklearn.ensemble import IsolationForest
 
-# Importamos los transformadores
-#from transformadores import CustomCleaner, DropColumnsAndRows, TimeTransformer, DropOnlyColums, RowDropper, CustomLabelEncoder, CustomStandardScaler, CustomMinMaxScaler, OneHotEncoderConcat
-#from transformadoresCaracteristicas import DateTimeUnifier, CoordenadasMerger, DuracionEstadoMinutos, UltimoRegistroPorEstado, RangoTiempoEvento, Horario
-from preprocesamiento import pipeline_preprocesamiento
+# Transformador para la limpieza
+class CustomCleaner(BaseEstimator, TransformerMixin):
+    def __init__(self, map_dict):
+        self.map_dict = map_dict
 
+    def fit(self, X, y=None):
+        return self
 
-#######################
-# Page configuration
-st.set_page_config(
-    page_title="Análisis de rutas",
-    page_icon="📍",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+    def transform(self, X):
+        X.loc[:, 'Tipo de Evento'] = X['Tipo de Evento'].str.lower()
+        X.loc[:, 'Tipo de Evento'] = X['Tipo de Evento'].str.replace('-', '')
+        X.loc[:, 'Tipo de Evento'] = X['Tipo de Evento'].str.replace('[^\w\s]', '')
+        X.loc[:, 'Tipo de Evento'] = X['Tipo de Evento'].str.strip()
+        X.loc[:, 'Tipo de Evento'] = X['Tipo de Evento'].replace(self.map_dict, regex=True)
+        return X
 
-#######################
-# Variables Globales
-#global resgistros_totales
-resgistros_totales = None
-resgistros_filtrados = None
-total_vehiculos = None
-lista_vehiculos = None
+# Transformador para eliminar variables y registros
+class DropColumnsAndRows(BaseEstimator, TransformerMixin):
+    def __init__(self, columns_to_drop, column_condition, condition_value):
+        self.columns_to_drop = columns_to_drop
+        self.column_condition = column_condition
+        self.condition_value = condition_value
 
-recorrido = None
-df_recorrido_trans = None
+    def fit(self, X, y=None):
+        return self
 
-#######################
-# Sidebar
-with st.sidebar:
-    st.title('🗺️ Análisis de Rutas - Fuente: SATRACK')
-    # Título de la aplicación
+    def transform(self, X):
+        X = X.drop(self.columns_to_drop, axis=1)
+        X_copy = X.copy()
+        X_copy = X_copy[X_copy[self.column_condition] != self.condition_value]
+        return X_copy
 
-    my_list = ['Sin información aún']
+# Transformador para las transformaciones de horas
+class TimeTransformer(BaseEstimator, TransformerMixin):
+    def __init__(self):
+        pass
 
-    st.header('Filtros')
-    
-    if lista_vehiculos is None:
-        st.multiselect(
-            "Filtre por la placa del vehículo:", 
-            my_list #my_list, 
-            #["China", "United States of America"]
-        ),
-    else:
-        st.multiselect(
-            "Filtre por la placa del vehículo:", 
-            lista_vehiculos #my_list, 
-            #["China", "United States of America"]
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        X['Hora GPS'] = X['Hora GPS'].str.replace(' AM', '').str.replace(' PM', '')
+        X['Hora Sistema'] = X['Hora Sistema'].str.replace(' AM', '').str.replace(' PM', '')
+        X['Hora GPS'] = pd.to_datetime(X['Hora GPS'], format='%H:%M:%S').dt.time
+        X['Hora Sistema'] = pd.to_datetime(X['Hora Sistema'], format='%H:%M:%S').dt.time
+        #X['Hora Sistema'] = X['Hora Sistema'].apply(lambda x: x.hour*3600 + x.minute*60 + x.second) # Nuevo, probar
+        #X['Hora GPS'] = X['Hora GPS'].apply(lambda x: x.hour*3600 + x.minute*60 + x.second) # Nuevo, probar
+        return X
+
+# Transformador para eliminar columnas #y hacer otra transformación de hora
+class DropOnlyColums(BaseEstimator, TransformerMixin):
+    def __init__(self, columns_to_drop):
+        self.columns_to_drop = columns_to_drop
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        X = X.drop(self.columns_to_drop, axis=1)
+        return X
+
+# Transformador para eliminar filas, tiene la opción para eliminar o conservar filas
+class RowDropper(BaseEstimator, TransformerMixin):
+    def __init__(self, column_to_filter, categories_to_erase=None, categories_to_conserve=None):
+        self.column_to_filter = column_to_filter
+        self.categories_to_erase = categories_to_erase
+        self.categories_to_conserve = categories_to_conserve
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        if self.categories_to_erase:
+            X = X[~X[self.column_to_filter].isin(self.categories_to_erase)]
+        if self.categories_to_conserve:
+            X = X[X[self.column_to_filter].isin(self.categories_to_conserve)]
+        return X
+    # Ejemplo de uso
+    # column_to_filter = 'Tipo de Evento'
+    # categories_to_erase = ['movimiento', 'exceso de velocidad']
+    # categories_to_conserve = ['parado', 'otra categoría']
+    # row_dropper = RowDropper(column_to_filter, categories_to_erase, categories_to_conserve)
+    # X_transformed = row_dropper.transform(X)
+
+# Transformador para LabelEncoder
+class CustomLabelEncoder(BaseEstimator, TransformerMixin):
+    def __init__(self, columns, keep_original=True):
+        """
+        Custom transformer to encode specified columns and optionally keep or drop original columns.
+
+        Parameters:
+        - columns: List of column names to encode.
+        - keep_original: If True, keep the original columns; if False, drop them (default is True).
+        """
+        self.columns = columns
+        self.keep_original = keep_original
+        self.encoders = {}  # Store LabelEncoders for each column
+
+    def fit(self, X, y=None):
+        for col in self.columns:
+            encoder = LabelEncoder()
+            encoder.fit(X[col])
+            self.encoders[col] = encoder
+        return self
+
+    def transform(self, X):
+        X_encoded = X.copy()
+
+        for col in self.columns:
+            encoded_col_name = f"{col}_LabelEncoded"
+            X_encoded[encoded_col_name] = self.encoders[col].transform(X_encoded[col])
+
+        if not self.keep_original:
+            X_encoded.drop(columns=self.columns, inplace=True)
+
+        return X_encoded
+
+# Transformador para StandardScaler
+class CustomStandardScaler(BaseEstimator, TransformerMixin):
+    def __init__(self, columns, keep_original=True):
+        """
+        Custom transformer to scale specified columns using Standard Scaler.
+
+        Parameters:
+        - columns: List of column names to scale.
+        - keep_original: If True, keep the original columns; if False, drop them (default is True).
+        """
+        self.columns = columns
+        self.keep_original = keep_original
+        self.scalers = {}  # Store StandardScalers for each column
+
+    def fit(self, X, y=None):
+        for col in self.columns:
+            scaler = StandardScaler()
+            scaler.fit(X[col].values.reshape(-1, 1))  # Reshape to 2D array
+            self.scalers[col] = scaler
+        return self
+
+    def transform(self, X):
+        X_scaled = X.copy()
+
+        for col in self.columns:
+            scaled_col_name = f"{col}_standardScaled"
+            X_scaled[scaled_col_name] = self.scalers[col].transform(X_scaled[col].values.reshape(-1, 1))
+
+        if not self.keep_original:
+            X_scaled.drop(columns=self.columns, inplace=True)
+
+        return X_scaled
+
+# Transformador para MinMaxScaler
+class CustomMinMaxScaler(BaseEstimator, TransformerMixin):
+    def __init__(self, columns, keep_original=True):
+        """
+        Custom transformer to scale specified columns using MinMax Scaler.
+
+        Parameters:
+        - columns: List of column names to scale.
+        - keep_original: If True, keep the original columns; if False, drop them (default is True).
+        """
+        self.columns = columns
+        self.keep_original = keep_original
+        self.scalers = {}  # Store MinMaxScalers for each column
+
+    def fit(self, X, y=None):
+        for col in self.columns:
+            scaler = MinMaxScaler()
+            scaler.fit(X[col].values.reshape(-1, 1))  # Reshape to 2D array
+            self.scalers[col] = scaler
+        return self
+
+    def transform(self, X):
+        X_scaled = X.copy()
+
+        for col in self.columns:
+            scaled_col_name = f"{col}_minMaxScaled"
+            X_scaled[scaled_col_name] = self.scalers[col].transform(X_scaled[col].values.reshape(-1, 1))
+
+        if not self.keep_original:
+            X_scaled.drop(columns=self.columns, inplace=True)
+
+        return X_scaled
+
+# Transformador OneHotEncoder que concatena el resultado al mismo DF
+class OneHotEncoderConcat(BaseEstimator, TransformerMixin):
+    def __init__(self, column):
+        self.column = column
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        X = X.copy()
+        # Obtener One-Hot Encoding para la columna especificada
+        tipo_evento_encoded = pd.get_dummies(X[self.column], prefix=self.column)
+
+        tipo_evento_encoded = tipo_evento_encoded.astype(int)
+
+        # Unir las nuevas columnas al DataFrame original
+        X = pd.concat([X, tipo_evento_encoded], axis=1)
+        return X
+
+# Transformador para el Modelo InsolationForest
+class CustomIsolationForest(BaseEstimator, TransformerMixin):
+    def __init__(self, n_estimators=100, max_samples='auto', contamination='auto', random_state=None):
+        self.n_estimators = n_estimators
+        self.max_samples = max_samples
+        self.contamination = contamination
+        self.random_state = random_state
+
+    def fit(self, X, y=None):
+        self.model_ = IsolationForest(n_estimators=self.n_estimators, max_samples=self.max_samples, contamination=self.contamination, random_state=self.random_state)
+        self.model_.fit(X)
+        return self
+
+    def transform(self, X):
+        scores = self.model_.decision_function(X)
+        return scores
+
+# Transformador para unificar fecha y hora en la misma columna
+class DateTimeUnifier(BaseEstimator, TransformerMixin):
+    #def __init__(self, date_col='fecha', time_col='hora', datetime_col='datetime'):
+    def __init__(self, date_col, time_col, datetime_col='datetime'):
+        self.date_col = date_col
+        self.time_col = time_col
+        self.datetime_col = datetime_col
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        #X = X.copy()
+        X[self.date_col] = X[self.date_col].astype(str)  # Convertir a string
+        X[self.time_col] = X[self.time_col].astype(str)  # Convertir a string
+        X[self.datetime_col] = pd.to_datetime(X[self.date_col] + ' ' + X[self.time_col])
+        # Unir las nuevas columnas al DataFrame original
+        #X = pd.concat([X, X[self.datetime_col]], axis=1)
+        return X
+
+# Transformador que permite unificar etiqueta de las coordenadas de otro DF con la información
+class CoordenadasMerger(BaseEstimator, TransformerMixin):
+    def __init__(self, df_referencia, columna_etiqueta, tol=0.0001, etiqueta_no_autorizado='Sitio no autorizado'):
+        self.df_referencia = df_referencia
+        self.columna_etiqueta = columna_etiqueta
+        self.tol = tol
+        self.etiqueta_no_autorizado = etiqueta_no_autorizado
+
+    def fit(self, X, y=None):
+        # No es necesario entrenar nada para este transformador
+        return self
+
+    def transform(self, X):
+        # Asegurarse de que las coordenadas estén en el mismo formato
+        X = X.copy()
+        df_referencia_indexed = self.df_referencia.set_index(['LATITUD', 'LONGITUD'])
+
+        # Función para buscar la etiqueta más cercana dentro de la tolerancia
+        def etiqueta_cercana(lat, lon, df_referencia_indexed, columna_etiqueta, tol, etiqueta_no_autorizado):
+            # Buscar en un cuadrado alrededor del punto
+            for lat_shift in np.arange(-tol, tol + tol/10, tol/10):
+                for lon_shift in np.arange(-tol, tol + tol/10, tol/10):
+                    try:
+                        return df_referencia_indexed.loc[(lat + lat_shift, lon + lon_shift), columna_etiqueta]
+                    except KeyError:
+                        continue
+            return etiqueta_no_autorizado  # Si no encuentra coincidencia, retorna la etiqueta de sitio no autorizado
+
+        # Aplicar la función a cada fila de X
+        X[self.columna_etiqueta] = X.apply(
+            lambda row: etiqueta_cercana(
+                row['Latitud'], row['Longitud'], df_referencia_indexed, self.columna_etiqueta, self.tol, self.etiqueta_no_autorizado
+            ), axis=1
         )
 
-    # Add a slider to the sidebar:
-    add_slider = st.slider(
-        'Select a range of values',
-        0.0, 100.0, (25.0, 75.0)
-    )
+        return X
 
-    st.button('Filtrar')
+# Transformador que permite calcular el tiempo de demora en cada estado
+class DuracionEstadoMinutos(BaseEstimator, TransformerMixin):
+    def __init__(self, columna_vehiculo='Vehículo', columna_datetime='datetime GPS', columna_estado='Estado'):
+        self.columna_vehiculo = columna_vehiculo
+        self.columna_datetime = columna_datetime
+        self.columna_estado = columna_estado
 
-#########################
-# Gráficos
-#def generar_graficos(df_filtered_estado_apagado):
-#    fig, axs = plt.subplots(1, 2, figsize=(15, 5))  # 1 fila, 2 columnas
+    def fit(self, X, y=None):
+        return self
 
-    # Gráfico de 'Sentido'
-    #df_filtered_estado_apagado.groupby('Sentido').size().plot(kind='barh', color=sns.palettes.mpl_palette('Dark2'), ax=axs[0])
-    #axs[0].spines[['top', 'right']].set_visible(False)
-    #axs[0].set_title('Distribución por Sentido. DF sin Estado Apagado')
+    def transform(self, X):
+        # Asegurarse de que las columnas estén en el formato correcto
+        X[self.columna_datetime] = pd.to_datetime(X[self.columna_datetime])
+        X = X.sort_values(by=[self.columna_vehiculo, self.columna_datetime])
 
-    # Gráfico de 'Horario'
-    #df_filtered_estado_apagado.groupby('Horario').size().plot(kind='barh', color=sns.palettes.mpl_palette('Dark2'), ax=axs[1])
-    #axs[1].spines[['top', 'right']].set_visible(False)
-    #axs[1].set_title('Distribución por Horario. DF sin Estado Apagado')
+        # Calcular la diferencia de tiempo entre filas consecutivas
+        X['Diferencia'] = X.groupby(self.columna_vehiculo)[self.columna_datetime].diff().shift(-1)
 
-    #return plt.show()
-#def generar_graficos(df_filtered_estado_apagado):
-    #plt.figure(figsize=(10, 5))  # Tamaño de la figura
+        # Identificar los cambios de estado
+        X['CambioEstado'] = X[self.columna_estado] != X[self.columna_estado].shift(1)
 
-    # Gráfico de 'Sentido'
-    #df_filtered_estado_apagado.groupby('Sentido').size().plot(kind='barh', color=sns.palettes.mpl_palette('Dark2'))
-    #plt.gca().spines[['top', 'right']].set_visible(False)
-    #plt.title('Distribución por Sentido. DF sin Estado Apagado')
+        # Calcular la duración del estado
+        X['DuracionEstado'] = X.groupby([self.columna_vehiculo, (X['CambioEstado']).cumsum()])['Diferencia'].transform('sum')
 
-    #return plt.show()
+        # Eliminar columnas temporales
+        X.drop(['Diferencia', 'CambioEstado'], axis=1, inplace=True)
 
-def generar_graficos(df_filtered_estado_apagado):
-    st.title('Distribución por Sentido. DF sin Estado Apagado')
+        # Convertir la columna a tipo timedelta
+        X['DuracionEstado'] = pd.to_timedelta(X['DuracionEstado'])
 
-    # Gráfico de 'Sentido'
-    sentido_counts = df_filtered_estado_apagado.groupby('Sentido').size()
-    st.bar_chart(sentido_counts)
+        # Convertir a minutos
+        #X['DuracionEstado_Minutos'] = X['DuracionEstado'].dt.total_seconds() / 60
 
+        # LLevar a minutos
+        X['DuracionEstadoMin'] = (X['DuracionEstado'].dt.total_seconds() / 60).round(2)
 
-#########################
-# Funciones principales del Dashboard
-def procesar_archivo():
-    global resgistros_totales
-    global resgistros_filtrados
-    global total_vehiculos
-    global lista_vehiculos
-    global df_recorrido_trans
+        return X
 
-    # Verificar si se ha cargado un archivo
-    if recorrido is not None:
-        # Leer el archivo CSV
-        df_recorrido = pd.read_csv(recorrido)
+# Transformador para conservar el último valor con los minutos de duración por Estado
+class UltimoRegistroPorEstado(BaseEstimator, TransformerMixin):
+    def __init__(self, columnas=['Vehículo', 'Estado', 'DuracionEstadoMin']):
+        self.columnas = columnas
 
-        # Mostrar el DataFrame
-        #st.write('**Datos del archivo CSV:**')
-        #st.write(df_recorrido)
+    def fit(self, X, y=None):
+        return self
 
-        # Opcional: Mostrar información adicional
-        #st.write('**INFORMACIÓN DE DATOS CARGADOS**')
-        #st.write(f"**Número total de filas:** {len(df_recorrido)}")
-        #st.write(f"**Columnas:** {df_recorrido.columns.tolist()}")
+    def transform(self, X):
+        # Identificar cambios en las columnas especificadas
+        X['group'] = (X[self.columnas].shift() != X[self.columnas]).any(axis=1).cumsum()
 
-        # Copia del DF original
-        df_copia = df_recorrido.copy()
-        
-        # Selección de características relevantes
-        #features = ['Estado', 'Tipo de Evento', 'Sentido', 'Velocidad (km/h)', 'Hora', 'Día de la semana', 'Es fin de semana']
-        #X = df[features]
-        
-        pipeline_preprocesamiento.fit(df_copia)
-        # Transformamos los datos
-        df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia)   
+        # Seleccionar el último registro de cada grupo
+        X_resultado = X.groupby('group').tail(1)
 
-        # Llenamos los indicadores
-        resgistros_totales = str(round(len(df_copia) / 1000, 1)) + " K"
-        resgistros_filtrados = str(round(len(df_recorrido_trans) / 1000, 1)) + " K"
-        total_vehiculos = len(df_recorrido_trans["Vehículo"].unique())
-        lista_vehiculos = list(df_recorrido_trans["Vehículo"].unique())
+        # Eliminar la columna 'group' usada para el cálculo
+        X_resultado = X_resultado.drop(columns=['group'])
+        return X_resultado
 
-        # resgistros_filtrados = len(df_recorrido_trans)
+# Transformador que permite estructurar en rangos el tiempo de demora de los Eventos
+class RangoTiempoEvento(BaseEstimator, TransformerMixin):
+    def __init__(self, columna_duracion='DuracionEstadoMin'):
+        self.columna_duracion = columna_duracion
 
-        # Función para verificar si un objeto es un DataFrame
-        def es_dataframe(obj):
-            return isinstance(obj, pd.DataFrame)
-        
-        if es_dataframe(df_recorrido_trans):
-                #st.success("El objeto es un DataFrame.")
-                st.success("Archivo cargado con éxito.")
-                #st.write("Las primeras filas del DataFrame son:")
-                #st.table(df_recorrido_trans[cols])
-                #st.table(df_recorrido_trans.head(10))
-    else:
-        st.write('Aún no se ha cargado ningún archivo.')
+    def fit(self, X, y=None):
+        return self
 
-#  Función para descargar archivo y mapa
-def descargar_archivo_mapa():
+    def transform(self, X):
+        # Definir una función para categorizar la duración
+        def categorizar_duracion(duracion):
+            if duracion <= 15:
+                return 'Menos de 15 min'
+            elif 15 < duracion <= 30:
+                return '15 y 30 min'
+            elif 30 < duracion <= 60:
+                return '30 y 60 min'
+            else:
+                return 'Más de 60 min'
+
+        # Aplicar la función a la columna de duración para crear la nueva característica
+        X['RangoTiempoEvento'] = X[self.columna_duracion].apply(categorizar_duracion)
+        return X
+
+# Transformador para crear la característica horario: día o noche
+class Horario(BaseEstimator, TransformerMixin):
+    def __init__(self, columna_datetime='datetime GPS'):
+        self.columna_datetime = columna_datetime
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        # Convertir la columna datetime a tipo datetime si aún no lo es
+        X[self.columna_datetime] = pd.to_datetime(X[self.columna_datetime])
+
+        # Definir una función para determinar si es día o noche
+        def dia_o_noche(hora):
+            if 6 <= hora.hour < 18:
+                return 'Día'
+            else:
+                return 'Noche'
+
+        # Aplicar la función a la columna de datetime para crear la nueva característica
+        X['Horario'] = X[self.columna_datetime].apply(lambda x: dia_o_noche(x))
+        return X
+
+# Construímos el pipeline para el preprocesamiento y creación de nuevas características
+pipeline_preprocesamiento = Pipeline([
+    ('Eliminar filas de Estado del vehículo', RowDropper(column_to_filter='Estado',
+                                                         categories_to_erase=['Movimiento'],
+                                                         categories_to_conserve=None)),
+    #('Agregar etiqueta de sitios autorizados', CoordenadasMerger(df_referencia=df_paradas, columna_etiqueta='JUSTIFICACION EVENTO', tol=0.0001)),
+    ('Trf1: cleaning', CustomCleaner(map_dict={'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u'})),
+    ('Trf2: drop_columns_and_rows', DropColumnsAndRows(columns_to_drop=['Edad del dato', 'Nivel de Batería',
+                                                                        'Temperatura', 'Estado de la puerta'],
+                                                       column_condition='Sentido', condition_value='-')),
+    ('time_transformer', TimeTransformer()),
+    ('Unificar columna fecha y hora GPS', DateTimeUnifier(date_col='Fecha GPS', time_col='Hora GPS', datetime_col='datetime GPS')),
+    ('Borrar columnas de horas y fechas', DropOnlyColums(columns_to_drop=['Fecha GPS', 'Hora GPS', 'Fecha Sistema',
+                                                                          'Hora Sistema'])),
+    ('Calcular duración de cada estado', DuracionEstadoMinutos()),
+    ('Dejar único valor por duración en cada estado', UltimoRegistroPorEstado()),
+    ('Crear característica de Rango de tiempo por evento', RangoTiempoEvento()),
+    ('Crear característica de Horario: día o noche', Horario()),
+])
+
+# Título de la aplicación
+st.title('Análisis de Rutas - Fuente: SATRACK')
+
+# Instrucciones para el usuario
+st.write('En esta aplicación podrás:')
+st.write('1. Identificar rápidamente los lugares donde uno o varios vehículos paran y por cuanto tiempo lo hicieron')
+st.write('2. Extraer el archivo identificando si estuvo o estuvieron en puntos autorizados')
+st.write(' ')         
+st.write('Cargue el archivo de Detalle del Recorrido.')
+st.write('')
+
+# Widget de carga de archivo
+recorrido = st.file_uploader("Cargar archivo CSV", type=['csv'])
+
+# Verificar si se ha cargado un archivo
+if recorrido is not None:
+    # Leer el archivo CSV
+    df_recorrido = pd.read_csv(recorrido)
+
+    # Mostrar el DataFrame
+    #st.write('**Datos del archivo CSV:**')
+    #st.write(df_recorrido)
+
+    # Opcional: Mostrar información adicional
+    st.write('**INFORMACIÓN DE DATOS CARGADOS**')
+    st.write(f"**Número total de filas:** {len(df_recorrido)}")
+    st.write(f"**Columnas:** {df_recorrido.columns.tolist()}")
+
+    # Copia del DF original
+    df_copia = df_recorrido.copy()
+    
+    # Selección de características relevantes
+    #features = ['Estado', 'Tipo de Evento', 'Sentido', 'Velocidad (km/h)', 'Hora', 'Día de la semana', 'Es fin de semana']
+    #X = df[features]
+    
+    pipeline_preprocesamiento.fit(df_copia)
+    # Transformamos los datos
+    df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia) 
+    df_recorrido_trans['DuracionEstado'] = df_recorrido_trans['DuracionEstado'].astype(str)
+
     # Función para descargar el DataFrame como archivo CSV
     def descargar_csv(df):
         try:
-            # Crear un buffer de BytesIO para almacenar temporalmente el texto
-            buffer = BytesIO()
             # Convertir el DataFrame a una cadena de texto (tabulado en este ejemplo)
-            text_data = df.to_csv(index=False, sep='\t')
-            # Escribir la cadena de texto en el buffer
-            buffer.write(text_data.encode())
-            # Obtener los bytes del buffer
-            buffer.seek(0)
-            return buffer
+            text_data = df.to_csv(encoding='latin1')
+            return text_data
         except Exception as e:
-            st.error(f"Error al exportar a TXT: {str(e)}")
+            st.error(f"Error al exportar a CSV: {str(e)}")
     
-    # Ejemplo de uso en Streamlit
     def main():
-        
         # Verificar si el DataFrame no está vacío
         if not df_recorrido_trans.empty:
             st.write('**INFORMACIÓN DE DATOS FILTRADOS**')
             st.write(f"**Número total de filas:** {len(df_recorrido_trans)}")
             st.write(f"**Columnas:** {df_recorrido_trans.columns.tolist()}")
-            st.write(df_recorrido_trans.head())
-            
-            # Botón de descarga CSV
+    
+            # Botón de descarga TXT
             if st.button('Descargar CSV'):
-                archivo_csv = descargar_csv(df_recorrido_trans)
-                if archivo_csv:
-                    st.download_button(label='Haz clic para descargar', data=archivo_csv, file_name='datos.csv', mime='text/csv')
+                archivo_txt = descargar_csv(df_recorrido_trans)
+                if archivo_txt:
+                    st.download_button(label='Haz clic para descargar', data=archivo_txt, file_name='Datos_Analisis.csv')
     
         else:
             st.error('El DataFrame está vacío. No hay datos para mostrar.')
@@ -238,83 +517,9 @@ def descargar_archivo_mapa():
     else:
         st.error('El archivo HTML generado no se encontró. Por favor, genera el mapa primero.')
 
-#######################
-# Dashboard procesamiento y gráfico
-col_archivo = st.columns((6, 2), gap='medium')
-with col_archivo[0]:
-    st.markdown('#### Procesamiento, métricas y gráficos:')
-    recorrido = st.file_uploader("Cargar archivo CSV", type=['csv'])
-    if recorrido is not None:
-        procesar_archivo()
-    
-    indi = st.columns(5)
-    with indi[0]:
-        st.metric(label="Registros totales", value=resgistros_totales) #, delta="1.2 K")
-    with indi[1]:
-        st.metric(label="Registros filtrados", value=resgistros_filtrados)
-    with indi[2]:
-        st.metric(label="Total de vehículos", value=total_vehiculos)
-    
-    if recorrido is not None:
-        # Llama a la función con tu DataFrame df_filtered_estado_apagado
-        generar_graficos(df_recorrido_trans)
-        st.write("Las primeras filas del DataFrame son:")
-        st.write(df_recorrido_trans.head())
-
-with col_archivo[1]:
-    st.markdown('#### Acerca de la aplicación:')
-    # Instrucciones para el usuario
-    with st.expander('Acerca de la aplicación', expanded=True):
-        st.write('''
-            En esta aplicación podrás:
-            - Identificar rápidamente los lugares donde uno o varios vehículos paran y por cuanto tiempo lo hicieron.
-            - Extraer el archivo identificando si estuvo o estuvieron en puntos autorizados.
-            - Descargar el mapa con la información sobre los puntos geográficos de los vehículos.
-            ''')
-
-#######################
-# Indicadores principales
-#st.metric(label="Registros totales", value=resgistros_totales) #, delta="1.2 K")
-#st.metric(label="Registros totales", value=resgistros_filtrados)
-#indi = st.columns(5)
-#with indi[0]:
-#    st.metric(label="Registros totales", value=resgistros_totales) #, delta="1.2 K")
-#with indi[1]:
-#    st.metric(label="Registros filtrados", value=resgistros_filtrados)
-#with indi[2]:
-#    st.metric(label="Total de vehículos", value=total_vehiculos)
+else:
+    st.write('Aún no se ha cargado ningún archivo.')
 
 
-#######################
-# Dashboard generación Mapa
-col = st.columns((6, 2), gap='medium')
 
-with col[0]:
-    st.markdown('#### Generación de mapa')
-
-    # Widget de carga de archivo
-   # recorrido = st.file_uploader("Cargar archivo CSV", type=['csv'])
-    #if recorrido is not None:   
-        #descargar_archivo_mapa()
-        
-    #resgistros_totales = len(recorrido)
-
-    # You can use a column just like st.sidebar:
-    #st.button('Press me!')
-    # Or even better, call Streamlit functions inside a "with" block:
-    #chosen = st.radio(
-    #    'Sorting hat',
-    #    ("Gryffindor", "Ravenclaw", "Hufflepuff", "Slytherin"))
-    #st.write(f"You are in {chosen} house!")
-
-#with col[1]:
-#    st.markdown('#### Acerca de la aplicación:')
-#    # Instrucciones para el usuario
-#    with st.expander('Acerca de la aplicación', expanded=True):
-#        st.write('''
-#            En esta aplicación podrás:
-#            - Identificar rápidamente los lugares donde uno o varios vehículos paran y por cuanto tiempo lo hicieron.
-#            - Extraer el archivo identificando si estuvo o estuvieron en puntos autorizados.
-#            - Descargar el mapa con la información sobre los puntos geográficos de los vehículos.
-#            ''')
 
