@@ -495,12 +495,6 @@ if recorrido is not None:
         buffer_distance_m = buffer_distance_km * 1000  # Convertir kilómetros a metros
         gdf1['geometry'] = gdf1.geometry.buffer(buffer_distance_m)
 
-        # Crear un índice espacial para gdf1
-        idx1 = gdf1.sindex
-
-        # Crear un índice espacial para gdf2
-        idx2 = gdf2.sindex
-
         # Realizar la intersección
         intersection = gpd.overlay(gdf2, gdf1, how='intersection')
         
