@@ -549,7 +549,7 @@ if recorrido is not None:
             ).add_to(marker_cluster)
 
          # Añadir marcadores al grupo desde PK CSV
-        for _, row in df.iterrows():
+        for _, row in df_pk.iterrows():
             folium.Marker(
                 location=[row['Latitud'], row['Longitud']],
                 popup=f"PK: <br>: {row['PK']}<br>Sistema: {row['Sistema_de_Transporte']}",
