@@ -469,7 +469,7 @@ if recorrido is not None:
     
         # Mostrar el DataFrame
         #st.write('**Datos del archivo CSV:**')
-        #st.write(df_recorrido)
+        #st.write(df_autorizado)
     
         # Opcional: Mostrar información adicional
         st.write('**INFORMACIÓN DE DATOS CARGADOS**')
@@ -569,6 +569,20 @@ if recorrido is not None:
                 fill_color="yellow",
                 fill=False,  # gets overridden by fill_color
                 popup=f"{row['PK']}<br>{row['Sistema_de_Transporte']}",
+            ).add_to(mapa)
+
+        # Añadir marcadores al grupo desde Puntos_Autorizados CSV
+        for _, row in df_df_autorizado.iterrows():
+            folium.Circle(
+                location=[row['Latitud'], row['Longitud']],
+                radius=50,
+                color="green",
+                weight=1,
+                fill_opacity=0.6,
+                opacity=1,
+                fill_color="green",
+                fill=False,  # gets overridden by fill_color
+                popup=f"{row['EMPRESA']}<br>{row['ETIQUETA']}<br>{row['NOMBRE']}",
             ).add_to(mapa)
         
         # Añadir control de capas
