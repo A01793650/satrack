@@ -90,6 +90,7 @@ class RowDropper(BaseEstimator, TransformerMixin):
         if self.categories_to_conserve:
             X = X[X[self.column_to_filter].isin(self.categories_to_conserve)]
         return X
+        
     # Ejemplo de uso
     # column_to_filter = 'Tipo de Evento'
     # categories_to_erase = ['movimiento', 'exceso de velocidad']
@@ -358,9 +359,9 @@ class RangoTiempoEvento(BaseEstimator, TransformerMixin):
         # Definir una función para categorizar la duración
         def categorizar_duracion(duracion):
             if duracion <= 15:
-                return 'Menos de 15 min'
+                return '15 min'
             elif 15 < duracion <= 30:
-                return '15 y 30 min'
+                return '30 min'
             elif 30 < duracion <= 60:
                 return '30 y 60 min'
             else:
@@ -524,7 +525,6 @@ if recorrido is not None:
     
         else:
             st.error('El DataFrame está vacío. No hay datos para mostrar.')
-            
     
         # Mapa centrado en una ubicación promedio
         map_center = [ df_recorrido_trans['Latitud'].mean(),  df_recorrido_trans['Longitud'].mean()]
