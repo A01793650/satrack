@@ -550,10 +550,16 @@ if recorrido is not None:
 
          # Añadir marcadores al grupo desde PK CSV
         for _, row in df_pk.iterrows():
-            folium.Marker(
+            folium.Circle(
                 location=[row['Latitud'], row['Longitud']],
-                popup=f"PK: <br>: {row['PK']}<br>Sistema: {row['Sistema_de_Transporte']}",
-                icon=folium.Icon(color='black')
+                radius=10,
+                color="black",
+                weight=1,
+                fill_opacity=0.6,
+                opacity=1,
+                fill_color="green",
+                fill=False,  # gets overridden by fill_color
+                popup=f"PK:{row['PK']}<br>Sistema: {row['Sistema_de_Transporte']}",
             ).add_to(mapa)
         
         # Añadir control de capas
