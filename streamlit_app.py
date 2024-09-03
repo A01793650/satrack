@@ -545,7 +545,7 @@ if recorrido is not None:
             folium.Marker(
                 location=[row['Latitud'], row['Longitud']],
                 popup=f"Vehículo: {row['Vehículo']}<br>Estado: {row['Estado']}<br>Duración: {row['DuracionEstadoMin']} min <br>Coordenadas: {row['Latitud']} {row['Longitud']}<br>Fecha: {row['datetime GPS']}",
-                icon=folium.Icon(color='red' if row['Estado'] == 'Apagado' else 'yellow' if row['Estado'] == 'Detenido' else 'green')
+                icon=folium.Icon(color='red' if row['RangoTiempoEvento'] == 'Más de 60 min' else 'yellow' if row['RangoTiempoEvento'] == '30 y 60 min'' else 'green')
             ).add_to(marker_cluster)
 
          # Añadir marcadores al grupo desde PK CSV
