@@ -562,7 +562,7 @@ if recorrido is not None:
             folium.Circle(
                 location=[row['Latitud'], row['Longitud']],
                 radius=20,
-                color="black",
+                color="yellow",
                 weight=1,
                 fill_opacity=0.6,
                 opacity=1,
