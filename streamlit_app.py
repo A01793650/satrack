@@ -453,7 +453,7 @@ if recorrido is not None:
     pipeline_preprocesamiento.fit(df_copia)
     # Transformamos los datos
     df_recorrido_trans = pipeline_preprocesamiento.transform(df_copia) 
-    df_recorrido_trans['DuracionEstado'] = df_recorrido_trans['DuracionEstado'].astype(str)
+    #df_recorrido_trans['DuracionEstado'] = df_recorrido_trans['DuracionEstado'].astype(str)
 
     st.write(' ')         
     st.write('Cargue el archivo de Puntos Autorizados.')
@@ -544,8 +544,8 @@ if recorrido is not None:
         for _, row in  df_recorrido_trans.iterrows():
             folium.Marker(
                 location=[row['Latitud'], row['Longitud']],
-                popup=f"Vehículo: {row['Vehículo']}<br>Estado: {row['Estado']}<br>Duración: {row['DuracionEstadoMin']} min <br>Coordenadas: {row['Latitud']} {row['Longitud']}<br>Fecha: {row['datetime GPS']}",
-                icon=folium.Icon(color='red' if row['RangoTiempoEvento'] == 'Más de 60 min' else 'yellow' if row['RangoTiempoEvento'] == '30 y 60 min' else 'green')
+                popup=f"Vehículo: {row['Vehículo']}<br>Estado: {row['Estado']}<br>Coordenadas: {row['Latitud']} {row['Longitud']}<br>Fecha: {row['datetime GPS']}",
+                icon=folium.Icon(color='red' if row['Estado'] == 'Apagado' else 'yellow' if row['Estado'] == 'Detenido-Ralenti' else 'green')
             ).add_to(marker_cluster)
 
          # Añadir marcadores al grupo desde PK CSV
