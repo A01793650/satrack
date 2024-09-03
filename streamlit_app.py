@@ -548,12 +548,12 @@ if recorrido is not None:
                 icon=folium.Icon(color='red' if row['Estado'] == 'Apagado' else 'yellow' if row['Estado'] == 'Detenido' else 'green')
             ).add_to(marker_cluster)
 
-         # Añadir marcadores al grupo desde el nuevo CSV
+         # Añadir marcadores al grupo desde PK CSV
         for _, row in df.iterrows():
             folium.Marker(
                 location=[row['Latitud'], row['Longitud']],
-                popup=f"PK: {row['Vehículo']}<br>Estado: {row['Estado']}<br>Duración: {row['DuracionEstadoMin']} min<br>Coordenadas: {row['Latitud']} {row['Longitud']}<br>Fecha: {row['datetime GPS']}",
-                icon=folium.Icon(color='red' if row['Estado'] == 'Apagado' else 'yellow' if row['Estado'] == 'Detenido' else 'green')
+                popup=f"PK: <br>: {row['PK']}<br>Sistema: {row['Sistema_de_Transporte']}",
+                icon=folium.Icon(color='black')
             ).add_to(marker_cluster)
         
         # Añadir control de capas
