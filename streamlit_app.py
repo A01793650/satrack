@@ -525,7 +525,11 @@ if recorrido is not None:
     
         else:
             st.error('El DataFrame está vacío. No hay datos para mostrar.')
-    
+            
+        # Cargar el CSV
+        csv_path = 'https://github.com/A01793650/satrack/blob/main/PK_3.csv'
+        df = pd.read_csv(csv_path)
+        
         # Mapa centrado en una ubicación promedio
         map_center = [ df_recorrido_trans['Latitud'].mean(),  df_recorrido_trans['Longitud'].mean()]
         mapa = folium.Map(location=map_center, zoom_start=6)
