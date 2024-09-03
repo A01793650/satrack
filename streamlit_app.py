@@ -535,7 +535,16 @@ if recorrido is not None:
         
         # Mapa centrado en una ubicación promedio
         map_center = [ df_recorrido_trans['Latitud'].mean(),  df_recorrido_trans['Longitud'].mean()]
-        mapa = folium.Map(location=map_center, zoom_start=6, tiles='Stamen Terrain')
+        mapa = folium.Map(location=map_center, zoom_start=6)
+
+        # Añadir capa de imagen satelital de Esri con la atribución requerida
+        folium.TileLayer(
+            tiles='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+            attr='Esri',
+            name='Esri Satellite',
+            overlay=False,
+            control=True
+        ).add_to(mapa)
         
         # Agrupar marcadores
         marker_cluster = MarkerCluster().add_to(mapa)
