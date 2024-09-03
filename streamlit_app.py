@@ -554,7 +554,7 @@ if recorrido is not None:
                 location=[row['Latitud'], row['Longitud']],
                 popup=f"PK: <br>: {row['PK']}<br>Sistema: {row['Sistema_de_Transporte']}",
                 icon=folium.Icon(color='black')
-            ).add_to(maPA)
+            ).add_to(mapa)
         
         # Añadir control de capas
         folium.LayerControl().add_to(mapa)
