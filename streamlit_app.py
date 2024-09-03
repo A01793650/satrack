@@ -532,9 +532,6 @@ if recorrido is not None:
 
         # Cargar el CSV desde GitHub
         df_pk = pd.read_csv(csv_url)
-
-        # Si el CSV contiene geometrías en formato WKT, convertirlas a objetos geométricos de Shapely
-        df_pk['geometry'] = df_pk['geometry'].apply(wkt.loads)
         
         # Mapa centrado en una ubicación promedio
         map_center = [ df_recorrido_trans['Latitud'].mean(),  df_recorrido_trans['Longitud'].mean()]
@@ -550,6 +547,17 @@ if recorrido is not None:
                 popup=f"Vehículo: {row['Vehículo']}<br>Estado: {row['Estado']}<br>Duración: {row['DuracionEstadoMin']} min <br>Coordenadas: {row['Latitud']} {row['Longitud']}<br>Fecha: {row['datetime GPS']}",
                 icon=folium.Icon(color='red' if row['Estado'] == 'Apagado' else 'yellow' if row['Estado'] == 'Detenido' else 'green')
             ).add_to(marker_cluster)
+
+         # Añadir marcadores al grupo desde el nuevo CSV
+        for _, row in df.iterrows():
+            folium.Marker(
+                location=[row['Latitud'], row['Longitud']],
+                popup=f"PK: {row['Vehículo']}<br>Estado: {row['Estado']}<br>Duración: {row['DuracionEstadoMin']} min<br>Coordenadas: {row['Latitud']} {row['Longitud']}<br>Fecha: {row['datetime GPS']}",
+                icon=folium.Icon(color='red' if row['Estado'] == 'Apagado' else 'yellow' if row['Estado'] == 'Detenido' else 'green')
+            ).add_to(marker_cluster)
+        
+        # Añadir control de capas
+        folium.LayerControl().add_to(mapa)
         
         # Mostrar mapa
         mapa.save('Mapa_Analisis.html')
