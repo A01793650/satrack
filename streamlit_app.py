@@ -561,7 +561,7 @@ if recorrido is not None:
         for _, row in df_pk.iterrows():
             folium.Circle(
                 location=[row['Latitud'], row['Longitud']],
-                radius=10,
+                radius=20,
                 color="black",
                 weight=1,
                 fill_opacity=0.6,
