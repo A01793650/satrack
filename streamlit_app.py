@@ -572,7 +572,7 @@ if recorrido is not None:
             ).add_to(mapa)
 
         # Añadir marcadores al grupo desde Puntos_Autorizados CSV
-        for _, row in df_autorizado.iterrows():
+        for _, row in df_copia_a.iterrows():
             folium.Circle(
                 location=[row['Latitud'], row['Longitud']],
                 radius=50,
