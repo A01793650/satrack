@@ -526,9 +526,11 @@ if recorrido is not None:
         else:
             st.error('El DataFrame está vacío. No hay datos para mostrar.')
             
-        # Cargar el CSV
-        csv_path = 'https://github.com/A01793650/satrack/blob/main/PK_3.csv'
-        df = pd.read_csv(csv_path)
+        # URL del archivo CSV en GitHub (enlace al archivo raw)
+        csv_url = 'https://raw.githubusercontent.com/A01793650/satrack/main/PK_3.csv'
+
+        # Cargar el CSV desde GitHub
+        df = pd.read_csv(csv_url)
         
         # Mapa centrado en una ubicación promedio
         map_center = [ df_recorrido_trans['Latitud'].mean(),  df_recorrido_trans['Longitud'].mean()]
