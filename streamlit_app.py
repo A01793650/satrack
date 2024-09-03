@@ -566,9 +566,9 @@ if recorrido is not None:
                 weight=1,
                 fill_opacity=0.6,
                 opacity=1,
-                fill_color="green",
+                fill_color="yellow",
                 fill=False,  # gets overridden by fill_color
-                popup=f"PK:{row['PK']}<br>Sistema: {row['Sistema_de_Transporte']}",
+                popup=f"{row['PK']}<br>{row['Sistema_de_Transporte']}",
             ).add_to(mapa)
         
         # Añadir control de capas
