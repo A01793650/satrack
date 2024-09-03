@@ -531,7 +531,10 @@ if recorrido is not None:
         csv_url = 'https://raw.githubusercontent.com/A01793650/satrack/main/PK_3.csv'
 
         # Cargar el CSV desde GitHub
-        df = pd.read_csv(csv_url)
+        df_pk = pd.read_csv(csv_url)
+
+        # Si el CSV contiene geometrías en formato WKT, convertirlas a objetos geométricos de Shapely
+        df_pk['geometry'] = df_pk['geometry'].apply(wkt.loads)
         
         # Mapa centrado en una ubicación promedio
         map_center = [ df_recorrido_trans['Latitud'].mean(),  df_recorrido_trans['Longitud'].mean()]
