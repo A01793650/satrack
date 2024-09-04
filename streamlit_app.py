@@ -582,7 +582,7 @@ if recorrido is not None:
                 opacity=1,
                 fill_color="green",
                 fill=False,  # gets overridden by fill_color
-                popup=f"{row['EMPRESA']}<br>{row['ETIQUETA']}<br>{row['NOMBRE']}",
+                popup=f"{row['Empresa']}<br>{row['Etiqueta']}<br>{row['Nombre']}",
             ).add_to(mapa)
         
         # Añadir control de capas
