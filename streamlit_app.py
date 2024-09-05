@@ -498,7 +498,7 @@ if recorrido is not None:
         gdf1['geometry'] = gdf1.geometry.buffer(buffer_distance_m)
 
         # Realizar la intersección
-        intersection = gpd.overlay(gdf2, gdf1, how='intersection')
+        intersection = gpd.overlay(gdf2, gdf1, how='symmetric_difference')
         
         # Convertir la intersección a un DataFrame
         intersection_df = pd.DataFrame(intersection.drop(columns='geometry'))
