@@ -498,10 +498,10 @@ if recorrido is not None:
         gdf1['geometry'] = gdf1.geometry.buffer(buffer_distance_m)
 
         # Realizar la intersección
-        #intersection = gpd.overlay(gdf2, gdf1, how='intersection')
+        intersection = gpd.overlay(gdf2, gdf1, how='intersection')
         
         # Convertir la intersección a un DataFrame
-        #intersection_df = pd.DataFrame(intersection.drop(columns='geometry'))
+        intersection_df = pd.DataFrame(intersection.drop(columns='geometry'))
 
         # Función para descargar el DataFrame como archivo CSV
         def descargar_csv(df):
