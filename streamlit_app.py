@@ -5,6 +5,7 @@ import os
 import geopandas as gpd
 import rarfile
 import tempfile
+from streamlit_folium import st_folium
 
 from folium.plugins import MarkerCluster
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -15,16 +16,35 @@ from shapely.geometry import Point
 from shapely import wkt
 from rtree import index
 
-st.set_page_config(layout="wide")
+st.title("Visor de múltiples KML en Streamlit 🌍")
 
-st.title("Visor de Shapefile en HTML")
+# Subida de múltiples archivos KML
+uploaded_files = st.file_uploader("Sube tus archivos KML", type=["kml"], accept_multiple_files=True)
 
-uploaded_file = st.file_uploader("Sube un ZIP con tu GeoJSON", type=["zip"])
+if uploaded_files:
+    m = folium.Map(location=[0, 0], zoom_start=2)  # mapa base
+    
+    for uploaded_file in uploaded_files:
+        try:
+            # Leer cada archivo KML
+            gdf = gpd.read_file(uploaded_file, driver="KML")
+            
+            # Calcular centro aproximado
+            center = [gdf.geometry.centroid.y.mean(), gdf.geometry.centroid.x.mean()]
+            m.location = center  # ajustar centro en la última capa cargada
 
-if uploaded_file:
-    gdf = gpd.read_file(f"zip://{uploaded_file}")
+            # Agregar al mapa
+            folium.GeoJson(
+                gdf,
+                name=uploaded_file.name,
+                tooltip=folium.GeoJsonTooltip(fields=gdf.columns, aliases=gdf.columns.tolist())
+            ).add_to(m)
+        
+        except Exception as e:
+            st.error(f"No se pudo leer {uploaded_file.name}: {e}")
+    
+    # Control de capas
+    folium.LayerControl().add_to(m)
 
-    center = [gdf.geometry.centroid.y.mean(), gdf.geometry.centroid.x.mean()]
-    m = folium.Map(location=center, zoom_start=12, tiles="CartoDB positron")
-    folium.GeoJson(gdf).add_to(m)
+    # Mostrar mapa
     st_folium(m, width=800, height=600)
