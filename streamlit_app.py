@@ -77,5 +77,3 @@ if os.path.isfile(archivo_html):
     if st.button('Descargar Mapa'):
         contenido_archivo = descargar_html()
         st.download_button(label='Haz clic para descargar', data=contenido_archivo, file_name='Mapa_Analisis.html', mime='text/html')
-    else:
-        st.error('El archivo HTML generado no se encontró. Por favor, genera el mapa primero.')
