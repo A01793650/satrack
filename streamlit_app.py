@@ -58,3 +58,24 @@ st_folium(m, width=800, height=600)
 # Exportar a HTML
 m.save("mapa_geojson.html")
 st.success("✅ Se exportó también como mapa_geojson.html")
+    
+# Ruta al archivo HTML generado por Folium o Plotly
+archivo_html = 'mapa_geojson.html'
+
+# Verificar si el archivo existe
+if os.path.isfile(archivo_html):
+    # Mostrar un mensaje o título
+    st.title('Descargar Mapa de Análisis')
+
+    # Mostrar el botón de descarga
+    def descargar_html():
+        with open(archivo_html, 'rb') as f:
+            contenido = f.read()
+        return contenido
+
+    # Botón de descarga
+    if st.button('Descargar Mapa'):
+        contenido_archivo = descargar_html()
+        st.download_button(label='Haz clic para descargar', data=contenido_archivo, file_name='Mapa_Analisis.html', mime='text/html')
+    else:
+        st.error('El archivo HTML generado no se encontró. Por favor, genera el mapa primero.')
