@@ -22,28 +22,25 @@ st.title("Visor de GeoJSON en Streamlit 🌍")
 uploaded_file = st.file_uploader("Sube tu archivo GeoJSON", type=["geojson", "json"])
 
 if uploaded_file is not None:
-    # Leer GeoJSON con GeoPandas
+    # Leer GeoJSON
     gdf = gpd.read_file(uploaded_file)
 
-    # Calcular el centro de la geometría
+    # Calcular centro del mapa
     center = [gdf.geometry.centroid.y.mean(), gdf.geometry.centroid.x.mean()]
-
-    # Crear mapa
     m = folium.Map(location=center, zoom_start=10)
 
-    # Agregar capa GeoJSON
-    folium.GeoJson(
-        gdf,
-        name="Capa GeoJSON",
-        tooltip=folium.GeoJsonTooltip(fields=gdf.columns, aliases=gdf.columns.tolist())
-    ).add_to(m)
+    # Verificar si hay atributos además de la geometría
+    atributos = [col for col in gdf.columns if col != "geometry"]
 
-    # Agregar control de capas
+    if atributos:
+        folium.GeoJson(
+            gdf,
+            name="Capa GeoJSON",
+            tooltip=folium.GeoJsonTooltip(fields=atributos, aliases=atributos)
+        ).add_to(m)
+    else:
+        folium.GeoJson(gdf, name="Capa GeoJSON").add_to(m)
+
     folium.LayerControl().add_to(m)
 
-    # Mostrar mapa en Streamlit
-    st_folium(m, width=800, height=600)
-    folium.LayerControl().add_to(m)
-
-    # Mostrar mapa
     st_folium(m, width=800, height=600)
