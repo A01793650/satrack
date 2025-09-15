@@ -18,7 +18,8 @@ from rtree import index
 
 # Lista de GeoJSON desde GitHub (raw links)
 geojson_urls = [
-    "https://raw.githubusercontent.com/A01793650/satrack/main/break.geojson"
+    "https://raw.githubusercontent.com/A01793650/satrack/main/break.geojson",
+    "https://raw.githubusercontent.com/A01793650/satrack/blob/main/bus.geojson"
 ]
 st.title("Visor de GeoJSON desde GitHub 🌍")
 
