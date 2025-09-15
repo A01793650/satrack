@@ -16,31 +16,37 @@ from shapely import wkt
 from streamlit_folium import st_folium
 from rtree import index
 
-st.title("Visor de GeoJSON en Streamlit 🌍")
+# Lista de GeoJSON desde GitHub (raw links)
+geojson_urls = [
+    "https://raw.githubusercontent.com/tu_usuario/tu_repo/main/archivo1.geojson",
+    "https://raw.githubusercontent.com/tu_usuario/tu_repo/main/archivo2.geojson"
+]
 
-# Subir archivo GeoJSON
-uploaded_file = st.file_uploader("Sube tu archivo GeoJSON", type=["geojson", "json"])
+# Crear mapa base
+m = folium.Map(location=[0, 0], zoom_start=2)
 
-if uploaded_file is not None:
-    # Leer GeoJSON
-    gdf = gpd.read_file(uploaded_file)
-
-    # Calcular centro del mapa
+# Cargar cada GeoJSON
+for url in geojson_urls:
+    gdf = gpd.read_file(url)
+    
+    # Calcular centro aproximado (última capa cargada)
     center = [gdf.geometry.centroid.y.mean(), gdf.geometry.centroid.x.mean()]
-    m = folium.Map(location=center, zoom_start=10)
-
-    # Verificar si hay atributos además de la geometría
+    m.location = center
+    
+    # Agregar capa con tooltip si hay atributos
     atributos = [col for col in gdf.columns if col != "geometry"]
-
     if atributos:
         folium.GeoJson(
             gdf,
-            name="Capa GeoJSON",
+            name=url.split("/")[-1],  # nombre del archivo
             tooltip=folium.GeoJsonTooltip(fields=atributos, aliases=atributos)
         ).add_to(m)
     else:
-        folium.GeoJson(gdf, name="Capa GeoJSON").add_to(m)
+        folium.GeoJson(gdf, name=url.split("/")[-1]).add_to(m)
 
-    folium.LayerControl().add_to(m)
+# Control de capas
+folium.LayerControl().add_to(m)
 
-    st_folium(m, width=800, height=600)
+# Exportar a HTML
+m.save("mapa_geojson.html")
+print("✅ Mapa exportado como mapa_geojson.html")
