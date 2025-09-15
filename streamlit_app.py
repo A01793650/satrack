@@ -18,8 +18,7 @@ from rtree import index
 
 # Lista de GeoJSON desde GitHub (raw links)
 geojson_urls = [
-    "https://raw.githubusercontent.com/tu_usuario/tu_repo/main/archivo1.geojson",
-    "https://raw.githubusercontent.com/tu_usuario/tu_repo/main/archivo2.geojson"
+    "https://github.com/A01793650/satrack/blob/main/break.geojson"
 ]
 
 # Crear mapa base
