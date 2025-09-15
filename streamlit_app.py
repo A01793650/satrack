@@ -5,7 +5,6 @@ import os
 import geopandas as gpd
 import rarfile
 import tempfile
-from streamlit_folium import st_folium
 
 from folium.plugins import MarkerCluster
 from sklearn.base import BaseEstimator, TransformerMixin
