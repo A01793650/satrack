@@ -32,20 +32,16 @@ geojson_urls = [
     "https://raw.githubusercontent.com/A01793650/satrack/main/user_sing_huaral.geojson"                 
 ]
 st.title("Visor de GeoJSON desde GitHub 🌍")
-# Crear mapa base con un centro inicial fijo (mejor rendimiento)
+
+# Crear mapa base con un centro fijo (no se recalcula en cada capa)
 m = folium.Map(location=[-12.0, -75.0], zoom_start=6)
 
 for url in geojson_urls:
     try:
         gdf = gpd.read_file(url)
 
-        # Calcular centro rápido con bounding box (no centroides pesados)
-        minx, miny, maxx, maxy = gdf.total_bounds
-        center = [(miny + maxy) / 2, (minx + maxx) / 2]
-        m.location = center
-
-        # Seleccionar solo las 3 primeras columnas no geométricas
-        atributos = [col for col in gdf.columns if col != "geometry"][:3]
+        # Solo el primer atributo no geométrico
+        atributos = [col for col in gdf.columns if col != "geometry"][:1]
 
         if atributos:
             folium.GeoJson(
@@ -65,7 +61,6 @@ folium.LayerControl().add_to(m)
 # Exportar a HTML
 m.save("mapa_geojson.html")
 
-# Ruta al archivo HTML generado por Folium
 archivo_html = "mapa_geojson.html"
 
 if os.path.isfile(archivo_html):
@@ -83,7 +78,6 @@ if os.path.isfile(archivo_html):
             file_name="Mapa_Analisis.html",
             mime="text/html"
         )
-    # Botón de descarga
     if st.button('Descargar Mapa'):
         contenido_archivo = descargar_html()
         st.download_button(label='Haz clic para descargar', data=contenido_archivo, file_name='Mapa_Analisis.html', mime='text/html')
