@@ -63,11 +63,10 @@ for url in geojson_urls:
 folium.LayerControl().add_to(m)
 
 # Mostrar en Streamlit
-st_folium(m, width=800, height=600)
+#st_folium(m, width=800, height=600)
 
 # Exportar a HTML
 m.save("mapa_geojson.html")
-st.success("✅ Se exportó también como mapa_geojson.html")
     
 # Ruta al archivo HTML generado por Folium o Plotly
 archivo_html = 'mapa_geojson.html'
