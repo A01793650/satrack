@@ -34,7 +34,7 @@ geojson_urls = [
 st.title("Visor de GeoJSON desde GitHub 🌍")
 
 # Crear mapa base
-m = folium.Map(location=[0, 0], zoom_start=2)
+m = folium.Map(location=[-12, -77], zoom_start=2)
 
 for url in geojson_urls:
     try:
