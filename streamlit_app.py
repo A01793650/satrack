@@ -31,7 +31,7 @@ geojson_urls = [
     "https://raw.githubusercontent.com/A01793650/satrack/main/lowvolt_line_huaral.geojson",
     "https://raw.githubusercontent.com/A01793650/satrack/main/user_sing_huaral.geojson"                 
 ]
-st.title("Visor de GeoJSON desde GitHub 🌍")
+st.title("AAAAVisor de GeoJSON desde GitHub 🌍")
 
 # Crear mapa base
 m = folium.Map(location=[0, 0], zoom_start=2)
