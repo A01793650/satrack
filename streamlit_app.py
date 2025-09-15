@@ -17,10 +17,10 @@ from rtree import index
 
 st.set_page_config(layout="wide")
 
-st.title("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVisor de Shapefile en HTML")
+st.title("Visor de Shapefile en HTML")
 
 # Ruta al rar (puede ser local o URL RAW en GitHub)
-rar_path = 'https://github.com/A01793650/satrack/blob/main/shp.rar'
+rar_path = "https://github.com/A01793650/satrack/blob/main/shp.rar"
 
 with tempfile.TemporaryDirectory() as tmpdir:
     rf = rarfile.RarFile(rar_path)
