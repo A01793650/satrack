@@ -20,32 +20,40 @@ from rtree import index
 geojson_urls = [
     "https://github.com/A01793650/satrack/blob/main/break.geojson"
 ]
+st.title("Visor de GeoJSON desde GitHub 🌍")
 
 # Crear mapa base
 m = folium.Map(location=[0, 0], zoom_start=2)
 
-# Cargar cada GeoJSON
 for url in geojson_urls:
-    gdf = gpd.read_file(url)
-    
-    # Calcular centro aproximado (última capa cargada)
-    center = [gdf.geometry.centroid.y.mean(), gdf.geometry.centroid.x.mean()]
-    m.location = center
-    
-    # Agregar capa con tooltip si hay atributos
-    atributos = [col for col in gdf.columns if col != "geometry"]
-    if atributos:
-        folium.GeoJson(
-            gdf,
-            name=url.split("/")[-1],  # nombre del archivo
-            tooltip=folium.GeoJsonTooltip(fields=atributos, aliases=atributos)
-        ).add_to(m)
-    else:
-        folium.GeoJson(gdf, name=url.split("/")[-1]).add_to(m)
+    try:
+        gdf = gpd.read_file(url)
+
+        # Calcular centro (última capa cargada)
+        center = [gdf.geometry.centroid.y.mean(), gdf.geometry.centroid.x.mean()]
+        m.location = center
+
+        # Verificar atributos
+        atributos = [col for col in gdf.columns if col != "geometry"]
+
+        if atributos:
+            folium.GeoJson(
+                gdf,
+                name=url.split("/")[-1],
+                tooltip=folium.GeoJsonTooltip(fields=atributos, aliases=atributos)
+            ).add_to(m)
+        else:
+            folium.GeoJson(gdf, name=url.split("/")[-1]).add_to(m)
+
+    except Exception as e:
+        st.error(f"No se pudo cargar {url}: {e}")
 
 # Control de capas
 folium.LayerControl().add_to(m)
 
+# Mostrar en Streamlit
+st_folium(m, width=800, height=600)
+
 # Exportar a HTML
 m.save("mapa_geojson.html")
-print("✅ Mapa exportado como mapa_geojson.html")
+st.success("✅ Se exportó también como mapa_geojson.html")
