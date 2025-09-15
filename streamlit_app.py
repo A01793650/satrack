@@ -32,19 +32,20 @@ geojson_urls = [
     "https://raw.githubusercontent.com/A01793650/satrack/main/user_sing_huaral.geojson"                 
 ]
 st.title("Visor de GeoJSON desde GitHub 🌍")
-
-# Crear mapa base
-m = folium.Map(location=[0, 0], zoom_start=2)
+# Crear mapa base con un centro inicial fijo (mejor rendimiento)
+m = folium.Map(location=[-12.0, -75.0], zoom_start=6)
 
 for url in geojson_urls:
     try:
         gdf = gpd.read_file(url)
-        
-        # Calcular centro (última capa cargada)
-        center = [gdf.geometry.centroid.y.mean(), gdf.geometry.centroid.x.mean()]
+
+        # Calcular centro rápido con bounding box (no centroides pesados)
+        minx, miny, maxx, maxy = gdf.total_bounds
+        center = [(miny + maxy) / 2, (minx + maxx) / 2]
         m.location = center
-        # Verificar atributos
-        atributos = [col for col in gdf.columns if col != "geometry"]
+
+        # Seleccionar solo las 3 primeras columnas no geométricas
+        atributos = [col for col in gdf.columns if col != "geometry"][:3]
 
         if atributos:
             folium.GeoJson(
@@ -61,26 +62,27 @@ for url in geojson_urls:
 # Control de capas
 folium.LayerControl().add_to(m)
 
-# Mostrar en Streamlit
-#st_folium(m, width=800, height=600)
-
 # Exportar a HTML
 m.save("mapa_geojson.html")
-    
-# Ruta al archivo HTML generado por Folium o Plotly
-archivo_html = 'mapa_geojson.html'
 
-# Verificar si el archivo existe
+# Ruta al archivo HTML generado por Folium
+archivo_html = "mapa_geojson.html"
+
 if os.path.isfile(archivo_html):
-    # Mostrar un mensaje o título
-    st.title('Descargar Mapa de Análisis')
+    st.title("Descargar Mapa de Análisis")
 
-    # Mostrar el botón de descarga
     def descargar_html():
-        with open(archivo_html, 'rb') as f:
-            contenido = f.read()
-        return contenido
+        with open(archivo_html, "rb") as f:
+            return f.read()
 
+    if st.button("Descargar Mapa"):
+        contenido_archivo = descargar_html()
+        st.download_button(
+            label="Haz clic para descargar",
+            data=contenido_archivo,
+            file_name="Mapa_Analisis.html",
+            mime="text/html"
+        )
     # Botón de descarga
     if st.button('Descargar Mapa'):
         contenido_archivo = descargar_html()
