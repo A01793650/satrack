@@ -13,6 +13,7 @@ from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.ensemble import IsolationForest
 from shapely.geometry import Point
 from shapely import wkt
+from streamlit_folium import st_folium
 from rtree import index
 
 st.title("AAAVisor de múltiples KML en Streamlit 🌍")
