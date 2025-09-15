@@ -39,7 +39,10 @@ m = folium.Map(location=[0, 0], zoom_start=2)
 for url in geojson_urls:
     try:
         gdf = gpd.read_file(url)
-
+        
+        # Calcular centro (última capa cargada)
+        center = [gdf.geometry.centroid.y.mean(), gdf.geometry.centroid.x.mean()]
+        m.location = center
         # Verificar atributos
         atributos = [col for col in gdf.columns if col != "geometry"]
 
