@@ -27,7 +27,8 @@ geojson_urls = [
     "https://raw.githubusercontent.com/A01793650/satrack/main/station.geojson",
     "https://raw.githubusercontent.com/A01793650/satrack/main/switch.geojson",
     "https://raw.githubusercontent.com/A01793650/satrack/main/cable_head_huaral.geojson",
-    "https://raw.githubusercontent.com/A01793650/satrack/main/lowvolt_cable_huaral.geojson"              
+    "https://raw.githubusercontent.com/A01793650/satrack/main/lowvolt_cable_huaral.geojson",
+    "https://raw.githubusercontent.com/A01793650/satrack/main/lowvolt_line_huaral.geojson"              
 ]
 st.title("Visor de GeoJSON desde GitHub 🌍")
 
