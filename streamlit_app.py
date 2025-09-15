@@ -19,19 +19,12 @@ st.set_page_config(layout="wide")
 
 st.title("Visor de Shapefile en HTML")
 
-# Ruta al rar (puede ser local o URL RAW en GitHub)
-rar_path = "https://github.com/A01793650/satrack/blob/main/shp.rar"
+uploaded_file = st.file_uploader("Sube un ZIP con tu GeoJSON", type=["zip"])
 
-with tempfile.TemporaryDirectory() as tmpdir:
-    rf = rarfile.RarFile(rar_path)
-    rf.extractall(tmpdir)
+if uploaded_file:
+    gdf = gpd.read_file(f"zip://{uploaded_file}")
 
-    m = folium.Map(location=[0,0], zoom_start=2, tiles="OpenStreetMap")
-
-    for file in os.listdir(tmpdir):
-        if file.endswith(".shp"):
-            gdf = gpd.read_file(os.path.join(tmpdir, file))
-            folium.GeoJson(gdf, name=file).add_to(m)
-
-    folium.LayerControl().add_to(m)
-    m.save("mapa.html")
+    center = [gdf.geometry.centroid.y.mean(), gdf.geometry.centroid.x.mean()]
+    m = folium.Map(location=center, zoom_start=12, tiles="CartoDB positron")
+    folium.GeoJson(gdf).add_to(m)
+    st_folium(m, width=800, height=600)
